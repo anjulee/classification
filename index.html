@@ -114,6 +114,12 @@
 
   .empty { padding: 30px; text-align: center; color: #7a8ba0; font-size: 13px; }
 
+  .fmt-btn { background:#fff; border:1px solid #d0d8e4; border-radius:4px; padding:3px 9px; font-size:12px; cursor:pointer; color:#2c3e50; transition:all 0.12s; font-family:inherit; }
+  .fmt-btn:hover { background:#e8f0fb; border-color:#3a7bd5; color:#003168; }
+  .pending-banner { background:#fff8e1; border:1px solid #ffe082; border-radius:8px; padding:14px 18px; display:flex; align-items:center; gap:12px; }
+  .pending-dot { width:10px; height:10px; background:#f9a825; border-radius:50%; animation:pulse 1.2s infinite; flex-shrink:0; }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
   .lang-table { width: 100%; border-collapse: collapse; font-size: 13px; }
   .lang-table th { font-size: 11px; font-weight: 700; color: #4a5568; text-transform: uppercase; padding: 6px 10px; background: #f8f9fc; border: 1px solid #e8ecf2; }
   .lang-table td { padding: 7px 10px; border: 1px solid #e8ecf2; }
@@ -233,7 +239,16 @@
           </div>
           <div class="form-group">
             <label>Functions / Key Results Expected</label>
-            <textarea id="functions" oninput="saveDraft()" style="min-height:260px;" placeholder="Group tasks under thematic headings, e.g.:&#10;&#10;HR Service Implementation&#10;&#10;Assists the HR Lead in monitoring contract statuses and preparing contract renewals.&#10;Maintains attendance registers, leave records, and other relevant reports.&#10;&#10;Knowledge Building and Sharing&#10;&#10;Actively participates in HR-related training and capacity-building initiatives."></textarea>
+            <div style="border:1px solid #d0d8e4; border-radius:6px; overflow:hidden; background:#fafbfc;">
+              <div style="display:flex; gap:2px; padding:6px 8px; border-bottom:1px solid #e8ecf2; background:#f4f6f9; flex-wrap:wrap;">
+                <button type="button" class="fmt-btn" onclick="fmtHeading()" title="Subheading (bold line)"><b>H</b></button>
+                <button type="button" class="fmt-btn" onclick="fmtBullet()" title="Bullet point">• list</button>
+                <button type="button" class="fmt-btn" onclick="fmtBold()" title="Bold"><b>B</b></button>
+                <div style="width:1px;background:#d0d8e4;margin:0 4px;"></div>
+                <span style="font-size:11px;color:#9ab3d0;align-self:center;padding-left:2px;">Tip: blank line between heading and tasks</span>
+              </div>
+              <textarea id="functions" oninput="saveDraft()" style="min-height:280px;border:none;border-radius:0;background:transparent;font-family:'Courier New',monospace;font-size:13px;line-height:1.7;padding:14px;" placeholder="HR Service Implementation&#10;&#10;• Assists the HR Lead in monitoring contract statuses and preparing renewals.&#10;• Maintains attendance registers, leave records, and other relevant reports.&#10;&#10;Knowledge Building and Sharing&#10;&#10;• Actively participates in HR-related training and capacity-building initiatives.&#10;• Contributes to knowledge networks and Communities of Practice (CoPs)."></textarea>
+            </div>
           </div>
         </div>
 
@@ -286,7 +301,7 @@
         </div>
         <div class="action-bar">
           <button class="btn-run" id="run-btn" onclick="runAnalysis()">▶ Classify &amp; Analyse</button>
-          <span style="font-size:12px; color:#7a8ba0;" id="mode-hint">Classifies the TOR and suggests language improvements</span>
+          <span style="font-size:12px; color:#7a8ba0;" id="mode-hint">Sends TOR to Claude in this chat — result appears above automatically</span>
         </div>
         <div id="analysis-result" style="padding: 0 20px 20px; display:none;"></div>
       </div>
@@ -554,7 +569,35 @@ function loadTORs() {
   renderSidebar();
 }
 
-/* ---- ANALYSIS ---- */
+/* ---- FUNCTIONS EDITOR HELPERS ---- */
+function fmtHeading() {
+  const ta = document.getElementById('functions');
+  const start = ta.selectionStart, end = ta.selectionEnd;
+  const sel = ta.value.slice(start, end) || 'Heading';
+  // Headings are just plain bold lines — represented as ALL CAPS or simply a line without a bullet
+  const lines = sel.split('\n').map(l => l.replace(/^[•\-\*]\s*/, '').toUpperCase());
+  const replacement = lines.join('\n');
+  ta.setRangeText(replacement, start, end, 'end');
+  ta.focus(); saveDraft();
+}
+function fmtBullet() {
+  const ta = document.getElementById('functions');
+  const start = ta.selectionStart, end = ta.selectionEnd;
+  const sel = ta.value.slice(start, end) || 'Task description.';
+  const lines = sel.split('\n').map(l => l.trim() ? (l.startsWith('•') ? l : '• ' + l.replace(/^[-*]\s*/, '')) : l);
+  ta.setRangeText(lines.join('\n'), start, end, 'end');
+  ta.focus(); saveDraft();
+}
+function fmtBold() {
+  const ta = document.getElementById('functions');
+  const start = ta.selectionStart, end = ta.selectionEnd;
+  const sel = ta.value.slice(start, end);
+  if (!sel) return;
+  ta.setRangeText('**' + sel + '**', start, end, 'end');
+  ta.focus(); saveDraft();
+}
+
+/* ---- ANALYSIS via sendPrompt ---- */
 function runAnalysis() {
   saveDraft();
   const tor = tors[currentTORId];
@@ -563,134 +606,121 @@ function runAnalysis() {
 
   const resultDiv = document.getElementById('analysis-result');
   resultDiv.style.display = 'block';
-  resultDiv.innerHTML = `<div class="loading-state"><div class="spinner"></div><div style="font-size:14px;color:#5a6a7e;">Analysing TOR against ICSC classification framework...</div></div>`;
+  resultDiv.innerHTML = `<div class="pending-banner"><div class="pending-dot"></div><div style="font-size:13px;color:#5a6a7e;">Analysis sent to Claude — scroll up to see the response, then click <strong>"Apply to TOR"</strong> in the result.</div></div>`;
 
   const hasTarget = !!tor.targetICS;
-  const targetNote = hasTarget ? `The user has set a TARGET ICS level of ICS ${tor.targetICS}. Classify the TOR as it currently stands, then suggest specific language improvements to align it to ICS ${tor.targetICS}.` : 'No target ICS level set. Classify the TOR based on its content and simply state which ICS level it is. Do NOT suggest improvements — only classify.';
 
-  const systemPrompt = `You are an expert UNOPS HR classifier with deep knowledge of the ICSC job evaluation methodology and the ICS 1–14 level framework.
+  const prompt = `You are an expert UNOPS HR classifier. Analyse the following TOR and respond with ONLY a valid JSON object — no prose, no markdown fences, just the raw JSON.
 
-CLASSIFICATION FRAMEWORK — four factors:
-1. NATURE OF WORK: Scope, depth, difficulty, knowledge requirements, action verbs used
-2. ENABLING/WORKING ENVIRONMENT: Supervision received, independence, risk management scope  
-3. PARTNERSHIPS: Level and nature of stakeholder contacts, purpose of interactions
-4. RESULTS-IMPACT RADIUS: Range of impact; supervisory/leadership level
+CLASSIFICATION FACTORS:
+1. Nature of Work: scope, depth, difficulty, knowledge, action verbs
+2. Working Environment: supervision received, independence, risk scope
+3. Partnerships: stakeholder contact level and purpose
+4. Results-Impact Radius: range of impact, supervisory role
 
-ICS LEVEL QUICK REFERENCE:
-- ICS 1–2: Manual/task-oriented. Close supervision. No judgment. Repetitive labor.
-- ICS 3: Process support. Routine tasks. Basic office work. Still supervised.
-- ICS 4: Basic transactions. Executing defined processes. Full knowledge of rules, no specialization.
-- ICS 5: Intricate transactions. Some judgment. Segment of a process. Specialist or generalist assistant.
-- ICS 6: Specialized process execution. Ensures integrity of an entire admin process. May supervise 1–2 staff.
-- ICS 7: Para-professional leadership. Manages integrated processes. Can improve the work, not just do it.
-- ICS 8: Basic analysis (start of professional category). Thought leadership begins. Applies conceptual models.
-- ICS 9: Substantive analysis. May modify conclusions/recommendations of others.
-- ICS 10: Complete mastery. Independently applies policies. Runs portfolios/programmes. May lead a team.
-- ICS 11: Originates/Innovates. Develops new policies. At least 30% novel work. Authoritative specialist.
-- ICS 12: Integrate/Deliver. Brings together multiple specialisations or teams.
-- ICS 13–14: Institutional stewards. Large programme leadership. Org-wide impact.
+ICS LEVELS:
+ICS 1-2: Manual/task. Close supervision. No judgment.
+ICS 3: Routine tasks. Basic office work. Supervised.
+ICS 4: Basic transactions. Defined processes. No specialisation.
+ICS 5: Intricate transactions. Some judgment. Segment of a process.
+ICS 6: Specialised process execution. Ensures integrity of entire admin process.
+ICS 7: Para-professional. Manages integrated processes. Can improve the work.
+ICS 8: Basic analysis. Start of professional category. Applies conceptual models.
+ICS 9: Substantive analysis. May modify conclusions of others.
+ICS 10: Complete mastery. Independently applies policies. Runs portfolios. May lead team.
+ICS 11: Originates/Innovates. New policies. At least 30% novel work.
+ICS 12: Integrate/Deliver. Brings together multiple teams or specialisations.
+ICS 13-14: Institutional stewards. Large programme leadership.
 
-RULES:
-- Support (ICS 1–7): transactional; measured by speed, accuracy, quality
-- Professional (ICS 8–14): analytical, evaluative, conceptual, transformative
-- Language matters: "assists", "supports", "prepares", "maintains" → lower; "analyses", "designs", "develops", "originates" → higher
-- Never upgrade for volume of work, number of supervisees, years of experience, or performance
-- All TOR language must be in third person
+RULES: Never upgrade for volume, headcount, experience, or performance. Support (ICS 1-7) = transactional. Professional (ICS 8-14) = analytical/transformative. All language must be third person.
 
-SKILLS VALIDATION: The user will provide a list of skills they have written for the TOR. You must check each one against the approved UNOPS Talent+Skills list below. Any skill that does not appear on this list (exact match, case-insensitive) must be flagged in the "invalidSkills" array with a suggested replacement from the list where possible.
+SKILLS VALIDATION — check each skill against this approved list (case-insensitive). Flag any not on the list:
+Administration, Administrative Management, Audit, Benefits Administration, Budget Analysis, Budget Management, Budgeting, Capacity Building, Change Management, Clerical Skills, Communication, Communication and Collaboration Tools, Communications Management, Compliance, Compliance Management, Contract Administration, Contract Analysis, Contract Drafting, Contract Management, Contract Negotiation, Contracts, Data Analysis, Data Collection, Data Management, Data Reporting, Data Visualization, Document Management, Emergency Management, Event Management, Finance, Finance Accounting, Financial Management, Financial Reporting, General Administration, Government Procurement, Human Resources, Human Resources Analytics, Human Resources Business Partnering, Human Resources Information Systems, Human Resources Management, Human Resources Operations, Human Resources Policies, Human Resources Software, Human Resources Strategy, Human Resources Support, HR Operations, HR Policies, HR Information Systems, Information Management, Inventory Management, Knowledge Management, Legal Advice, Legal Affairs, Legal Analysis, Legal Compliance, Legal Document Preparation, Legal Framework, Legal Operations, Legal Research, Legal Writing, Logistics, Logistics Management, Logistics Planning, Office Administration, Office Management, Operational Management, Operations Management, Payroll, Payroll Administration, Payroll Management, Performance Management, Personnel Administration, Personnel Management, Policy Analysis, Policy Development, Policy Implementation, Policy Research, Procurement, Procurement Contracts, Project Management, Project Management Body of Knowledge, Project Management Methodologies, Project Management Office, Project Management Support, Project Management Tools, Public Administration, Public Procurement, Quality Management, Recruitment, Recruitment Planning, Recruitment Strategies, Reporting, Risk Management, Security, Security Management, Stakeholder Management, Strategic Communications, Strategic Human Resource Planning, Strategic Procurement, Supply Chain Management, Talent Acquisition, Talent Development, Talent Management, Team Leadership, Team Management, Training, Training & Development, Training Coordination, Travel Management, Vendor Management, Workforce Management, Transportation, Information Management
 
-APPROVED SKILLS LIST (partial — key UNOPS-relevant skills):
-Administration, Administrative Management, Audit, Benefit Administration, Benefits Administration, Budget Analysis, Budget Management, Budget Monitoring, Budgeting, Business Administration, Capacity Building, Capacity Development, Change Management, Clerical Skills, Communication, Communication and Collaboration Tools, Communications Management, Communications Planning, Compliance, Compliance Management, Contract Administration, Contract Analysis, Contract Drafting, Contract Management, Contract Negotiation, Contract Review, Contracts, Data Analysis, Data Collection, Data Management, Data Reporting, Data Visualization, Document Management, Emergency Management, Event Management, Finance, Finance Accounting, Financial Management, Financial Reporting, General Administration, Government Procurement, Human Resources, Human Resources Analytics, Human Resources Business Partnering, Human Resources Consulting, Human Resources Information Systems, Human Resources Management, Human Resources Management Operations, Human Resources Operations, Human Resources Policies, Human Resources Software, Human Resources Strategy, Human Resources Support, HR Operations, HR Policies, HR Information Systems, Information Management, Inventory Management, Knowledge Management, Legal Advice, Legal Affairs, Legal Analysis, Legal Compliance, Legal Document Preparation, Legal Framework, Legal Operations, Legal Research, Legal Writing, Logistics, Logistics Management, Logistics Planning, Office Administration, Office Management, Operational Management, Operations Management, Payroll, Payroll Administration, Payroll Management, Performance Management, Personnel Administration, Personnel Management, Policy Analysis, Policy Development, Policy Implementation, Policy Research, Procurement, Procurement Contracts, Project Management, Project Management Body of Knowledge, Project Management Methodologies, Project Management Office, Project Management Support, Project Management Tools, Public Administration, Public Procurement, Quality Management, Recruitment, Recruitment Planning, Recruitment Strategies, Reporting, Risk Management, Security, Security Management, Stakeholder Management, Strategic Communications, Strategic Human Resource Planning, Strategic Procurement, Supply Chain Management, Talent Acquisition, Talent Development, Talent Management, Team Leadership, Team Management, Training, Training & Development, Training Coordination, Travel Management, Vendor Management, Workforce Management, Transportation, Inventory Management, Information Management
-- HR Assistant ICS 4: Tracks requests, drafts offers, monitors recruitment, maintains files, addresses queries.
-- HR Senior Assistant ICS 5: Executes intricate transactions, monitors transactions, collects/verifies documentation, provides inputs to SOPs.
-- HR Associate ICS 6: Monitors/tracks HR transactions, researches precedents, provides professional advice, coordinates workflow, contributes to SOPs.
-- HR Senior Associate ICS 7: Provides guidance on systems/processes, advises on recruitment, manages integrated HR processes, supports payroll verification.
-- HR Officer ICS 8: Conducts analysis, provides substantive advice, applies conceptual models, contributes to policy.
-- HR Senior Officer ICS 9: Analyses HR service lines, makes substantive contributions, may modify recommendations.
-- HR Specialist ICS 10: Leads HR implementation, designs HR projects, strategic guidance, runs portfolio, oversees team.
-- Administration Clerk ICS 3: Routine admin, filing, reception, logistics assistance, basic data entry.
-- Administration Assistant ICS 4: Ensures maintenance, coordinates transport, implements systems, manages inventory.
-- Administration Associate ICS 6: Coordinates work areas, monitors performance, oversees logistics, compiles data.
-- Finance Assistant ICS 4: Processes transactions, maintains records, verifies documentation.
-- Finance Senior Officer ICS 9: Analyses financial data, makes recommendations, substantive contributions.
-- Procurement Associate ICS 6: Ensures process integrity, coordinates procurement workflow, advises on rules.
-- Project Manager ICS 10: Manages projects, runs portfolio, independently applies PM methodology, supervises team.
+FUNCTION AREAS (pick one): Administration, Communications, Construction & Engineering, Data Analysis, Finance, Human Resources, ICT, Legal, Partnerships, Procurement, Project Management, Security
 
-FUNCTION AREA IDENTIFICATION: Based on the TOR content, identify the most appropriate functional area from: Administration, Communications, Construction & Engineering, Data Analysis, Finance, Human Resources, ICT, Legal, Partnerships, Procurement, Project Management, Project Manager, Security.
+${hasTarget ? `TARGET: The user wants this TOR aligned to ICS ${tor.targetICS}. After classifying, provide language suggestions (verb/scope changes only — no new tasks). If a task is too high, suggest removal or reframing. Also provide revisedRolePurpose and revisedFunctions at the target level.` : 'No target level set. Classify only. Leave suggestions, revisedRolePurpose, revisedFunctions as null/empty.'}
 
-Respond in valid JSON only (no markdown or code fences). Schema:
+TOR TO CLASSIFY:
+Title: ${tor.title}
+Role Purpose: ${tor.rolePurpose || '(not provided)'}
+Functions:
+${tor.functions}
+Skills: ${(tor.skills||[]).join(', ') || '(none listed)'}
+Qualifications: ${tor.eduRequired || '(not provided)'}
+
+JSON SCHEMA — respond with exactly this structure:
 {
-  "classifiedLevel": number,
-  "functionArea": "string — identified function area",
-  "confidenceNote": "string",
-  "workCategory": "Support" | "Professional",
-  "overallJustification": "string — clear explanation of the ICS level",
+  "classifiedLevel": <number>,
+  "functionArea": "<string>",
+  "workCategory": "Support" or "Professional",
+  "confidenceNote": "<short string>",
+  "overallJustification": "<string>",
   "factors": {
-    "natureOfWork": { "verdict": "aligned"|"above"|"below", "analysis": "string" },
-    "workingEnvironment": { "verdict": "aligned"|"above"|"below", "analysis": "string" },
-    "partnerships": { "verdict": "aligned"|"above"|"below", "analysis": "string" },
-    "resultsImpact": { "verdict": "aligned"|"above"|"below", "analysis": "string" }
+    "natureOfWork": { "verdict": "aligned"|"above"|"below", "analysis": "<string>" },
+    "workingEnvironment": { "verdict": "aligned"|"above"|"below", "analysis": "<string>" },
+    "partnerships": { "verdict": "aligned"|"above"|"below", "analysis": "<string>" },
+    "resultsImpact": { "verdict": "aligned"|"above"|"below", "analysis": "<string>" }
   },
-  "keyVerbs": ["array of action verbs found"],
-  "redFlags": ["language inconsistencies, if any"],
-  "invalidSkills": [
-    { "skill": "string — skill as entered", "reason": "not on approved list", "suggestedReplacement": "string or null" }
-  ],
-  "hasSuggestions": true | false,
-  "targetLevel": number | null,
-  "suggestions": [
-    { "type": "modify"|"remove", "original": "string", "revised": "string or null", "reason": "string" }
-  ],
-  "revisedRolePurpose": "string or null — only if suggestions provided",
-  "revisedFunctions": "string or null — full revised functions text, only if suggestions provided"
+  "keyVerbs": ["<verb>"],
+  "redFlags": ["<string>"],
+  "invalidSkills": [{ "skill": "<string>", "suggestedReplacement": "<string or null>" }],
+  "suggestions": [{ "type": "modify"|"remove", "original": "<string>", "revised": "<string or null>", "reason": "<string>" }],
+  "revisedRolePurpose": "<string or null>",
+  "revisedFunctions": "<string or null>"
 }`;
 
-  const userMsg = `${targetNote}
+  // Store pending context
+  window._pendingTOR = { ...tor };
+  window._pendingTORId = currentTORId;
+  sendPrompt(prompt);
+}
 
-POSITION TITLE: ${tor.title}
-ROLE PURPOSE: ${tor.rolePurpose || '(not provided)'}
-FUNCTIONS / KEY RESULTS EXPECTED:
-${tor.functions}
-SKILLS: ${(tor.skills||[]).join(', ') || '(not specified)'}
-QUALIFICATIONS: ${tor.eduRequired || '(not provided)'}
-EXPERIENCE: ${tor.expRequired || '(not provided)'}
+/* ---- RECEIVE RESULT FROM CHAT ---- */
+// Claude's JSON reply will appear in the conversation. We watch for it via storage ping
+// The user clicks "Apply to TOR" on the result that appears in chat — OR we auto-detect
+// via a message listener. For claude.ai artifacts, use window message events.
+window.addEventListener('message', function(e) {
+  if (!window._pendingTOR) return;
+  const payload = e.data;
+  // claude.ai sends assistant messages as { type: 'assistant_message', text: '...' }
+  // or sometimes the full text directly
+  let text = '';
+  if (typeof payload === 'string') text = payload;
+  else if (payload?.text) text = payload.text;
+  else if (payload?.content) text = payload.content;
+  else return;
 
-Identify the function area from the content. ${hasTarget ? `Classify, then provide specific language improvement suggestions (verb changes, scope adjustments) to align the TOR to ICS ${tor.targetICS}. Do NOT add new tasks — only modify or remove existing ones. If a task is too high for ICS ${tor.targetICS}, suggest removal or a reframed version. Also provide revised role purpose and revised full functions text at the target level.` : 'Only classify. No suggestions needed.'}`;
+  if (!text.includes('classifiedLevel')) return;
+  applyResult(text);
+});
 
-  // Use the Anthropic API — claude.ai artifacts have access via the proxy
-  fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      "x-api-key": "proxy",
-      "anthropic-version": "2023-06-01",
-      "anthropic-dangerous-direct-browser-access": "true"
-    },
-    body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 2500,
-      system: systemPrompt,
-      messages: [{ role: "user", content: userMsg }]
-    })
-  })
-  .then(r => r.json())
-  .then(data => {
-    if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
-    const raw = (data.content || []).map(c => c.text || "").join("");
-    const jsonMatch = raw.replace(/```json|```/g, "").trim().match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error("No JSON in response: " + raw.slice(0, 200));
+function applyResult(raw) {
+  if (!window._pendingTOR) return;
+  const tor = window._pendingTOR;
+  const resultDiv = document.getElementById('analysis-result');
+  try {
+    const jsonMatch = raw.replace(/```json|```/g, '').match(/\{[\s\S]*"classifiedLevel"[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('No classification JSON found.');
     const result = JSON.parse(jsonMatch[0]);
-    if (result.classifiedLevel && currentTORId && tors[currentTORId]) {
-      tors[currentTORId].classifiedICS = result.classifiedLevel;
-      if (result.functionArea) { tors[currentTORId].area = result.functionArea; updateAreaTag(result.functionArea); }
+
+    const tid = window._pendingTORId;
+    if (result.classifiedLevel && tid && tors[tid]) {
+      tors[tid].classifiedICS = result.classifiedLevel;
+      if (result.functionArea) { tors[tid].area = result.functionArea; updateAreaTag(result.functionArea); }
       saveTORs(); renderSidebar();
     }
+    window._pendingTOR = null;
+    window._pendingTORId = null;
     renderResult(result, tor);
-  })
-  .catch(err => {
-    document.getElementById('analysis-result').innerHTML =
-      `<div class="callout warning"><span class="callout-icon">⚠</span><div class="callout-text"><strong>Analysis failed.</strong><br>${escHtml(err.message)}</div></div>`;
-  });
+  } catch(err) {
+    resultDiv.innerHTML = `<div class="callout warning"><span class="callout-icon">⚠</span><div class="callout-text"><strong>Could not parse result.</strong> ${escHtml(err.message)}<br><br>
+    <button class="btn-primary" style="font-size:12px;padding:6px 14px;" onclick="document.getElementById('parse-input').style.display='block'">Paste JSON manually</button>
+    <div id="parse-input" style="display:none;margin-top:10px;">
+      <textarea id="manual-json" style="width:100%;min-height:80px;font-size:12px;font-family:monospace;" placeholder="Paste the JSON from Claude's response here..."></textarea>
+      <button class="btn-primary" style="font-size:12px;padding:6px 14px;margin-top:6px;" onclick="applyResult(document.getElementById('manual-json').value)">Apply</button>
+    </div></div></div>`;
+  }
 }
 
 function renderResult(result, tor) {
