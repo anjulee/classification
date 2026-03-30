@@ -572,7 +572,13 @@ function loadTOR(id) {
   const uz = document.getElementById('upload-zone');
   if (uz) { uz.className = 'upload-zone'; uz.innerHTML = `<div class="upload-zone-icon">📄</div><div class="upload-zone-title">Upload TOR document</div><div class="upload-zone-sub">Drag &amp; drop a .docx or .txt file, or click to browse</div>`; }
   renderSidebar();
-  switchTab('upload');
+  // Restore saved classification result if it exists
+  if (tor.lastResult) {
+    switchTab('analysis');
+    renderResult(tor.lastResult, tor);
+  } else {
+    switchTab('upload');
+  }
 }
 
 function updateAreaTag(area) {
@@ -841,6 +847,7 @@ function applyResult(raw) {
     if (result.classifiedLevel && tid && tors[tid]) {
       tors[tid].classifiedICS = result.classifiedLevel;
       tors[tid].classifiedAt = new Date().toISOString();
+      tors[tid].lastResult = result;  // persist full result
       if (result.functionArea) { tors[tid].area = result.functionArea; updateAreaTag(result.functionArea); }
       saveTORs(); renderSidebar();
     }
@@ -960,6 +967,11 @@ function renderResult(result, tor) {
     </div>` : '';
 
   document.getElementById('analysis-result').innerHTML = `
+    <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+      <button onclick="downloadPDF()" style="display:flex;align-items:center;gap:6px;padding:7px 16px;background:#003168;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;" onmouseover="this.style.background='#004a9e'" onmouseout="this.style.background='#003168'">
+        ↓ Download PDF
+      </button>
+    </div>
     <div class="result-header">
       <div class="ics-level-badge">ICS ${result.classifiedLevel}</div>
       <div>
@@ -999,7 +1011,178 @@ function addSkillFromSuggestion(skill) {
   addSkill(skill);
 }
 
-/* ---- EXPORT ---- */
+/* ---- PDF DOWNLOAD ---- */
+function downloadPDF() {
+  const tor = tors[currentTORId];
+  if (!tor || !tor.lastResult) { alert('No classification result to export.'); return; }
+  const result = tor.lastResult;
+  const hasTarget = !!tor.targetICS;
+  const isSupport = result.classifiedLevel <= 7;
+  const catLabel = isSupport ? 'Support Function' : 'Professional Function';
+  const catColor = isSupport ? '#1565a3' : '#2e7d32';
+
+  const confLevel = result.confidenceLevel || 'Medium';
+  const confColors = { High:'#1b5e20', Medium:'#e65100', Low:'#880e4f' };
+  const confBg = { High:'#e8f5e9', Medium:'#fff8e1', Low:'#fce4ec' };
+  const confDot = { High:'#43a047', Medium:'#ffa726', Low:'#e91e63' };
+
+  const classifiedDate = tor.classifiedAt
+    ? new Date(tor.classifiedAt).toLocaleDateString('en-GB', {day:'2-digit', month:'long', year:'numeric'})
+    : new Date().toLocaleDateString('en-GB', {day:'2-digit', month:'long', year:'numeric'});
+
+  const vLabel = { aligned:'Aligned', above:'Above level', below:'Below level' };
+  const vColors = { aligned:{bg:'#e8f5e9',color:'#1b5e20'}, above:{bg:'#fff3e0',color:'#e65100'}, below:{bg:'#fce4ec',color:'#880e4f'} };
+
+  const factorRows = [
+    ['Nature of Work', result.factors?.natureOfWork],
+    ['Working Environment', result.factors?.workingEnvironment],
+    ['Partnerships', result.factors?.partnerships],
+    ['Results-Impact Radius', result.factors?.resultsImpact]
+  ].filter(([,f])=>f).map(([name,f]) => {
+    const vc = vColors[f.verdict] || vColors.aligned;
+    return `<tr>
+      <td style="padding:10px 14px;border-bottom:1px solid #edf0f5;font-weight:600;color:#003168;width:160px;vertical-align:top;">${name}</td>
+      <td style="padding:10px 14px;border-bottom:1px solid #edf0f5;width:100px;vertical-align:top;">
+        <span style="background:${vc.bg};color:${vc.color};font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px;">${vLabel[f.verdict]}</span>
+      </td>
+      <td style="padding:10px 14px;border-bottom:1px solid #edf0f5;font-size:12px;color:#2c3e50;line-height:1.6;vertical-align:top;">${escHtml(f.analysis)}</td>
+    </tr>`;
+  }).join('');
+
+  const suggestionsBlock = hasTarget && (result.suggestions||[]).length ? `
+    <div style="margin-top:24px;">
+      <h3 style="font-size:11px;font-weight:700;color:#7a8ba0;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px;">Language Suggestions — Align to ICS ${tor.targetICS}</h3>
+      ${result.suggestions.map(s => `
+        <div style="padding:10px 14px;background:#f8f9fc;border-left:3px solid ${s.type==='remove'?'#e53935':'#3a7bd5'};border-radius:0 6px 6px 0;margin-bottom:8px;font-size:12px;line-height:1.6;color:#2c3e50;">
+          <strong>Original:</strong> "${escHtml(s.original)}"<br>
+          ${s.type==='remove'
+            ? `<span style="color:#c0392b;font-style:italic;">Remove — ${escHtml(s.reason)}</span>`
+            : `<strong>Revised:</strong> "${escHtml(s.revised||'')}"<br><span style="color:#7a8ba0;font-size:11px;">${escHtml(s.reason)}</span>`}
+        </div>`).join('')}
+    </div>` : '';
+
+  const revisedPurposeBlock = hasTarget && result.revisedRolePurpose ? `
+    <div style="margin-top:24px;">
+      <h3 style="font-size:11px;font-weight:700;color:#7a8ba0;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">Revised Role Purpose — ICS ${tor.targetICS}</h3>
+      <div style="padding:14px;background:#f8f9fc;border-radius:6px;font-size:12px;line-height:1.7;color:#2c3e50;white-space:pre-wrap;">${escHtml(result.revisedRolePurpose)}</div>
+    </div>` : '';
+
+  const revisedFunctionsBlock = hasTarget && result.revisedFunctions ? `
+    <div style="margin-top:24px;">
+      <h3 style="font-size:11px;font-weight:700;color:#7a8ba0;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">Revised Functions — ICS ${tor.targetICS}</h3>
+      <div style="padding:14px;background:#f8f9fc;border-radius:6px;font-size:12px;line-height:1.7;color:#2c3e50;white-space:pre-wrap;">${escHtml(result.revisedFunctions)}</div>
+    </div>` : '';
+
+  const invalidSkillsBlock = (result.invalidSkills||[]).length ? `
+    <div style="margin-top:24px;padding:12px 16px;background:#fff8e1;border:1px solid #ffe082;border-radius:8px;">
+      <div style="font-size:11px;font-weight:700;color:#e65100;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">⚠ Skills not on approved list</div>
+      ${result.invalidSkills.map(s => `<div style="font-size:12px;color:#2c3e50;margin-bottom:4px;">• <strong>${escHtml(s.skill)}</strong>${s.suggestedReplacement ? ` → <em>${escHtml(s.suggestedReplacement)}</em>` : ' — no direct equivalent found'}</div>`).join('')}
+    </div>` : '';
+
+  const suggestedSkillsBlock = (result.suggestedSkills||[]).length ? `
+    <div style="margin-top:16px;">
+      <div style="font-size:11px;font-weight:700;color:#7a8ba0;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Suggested Skills</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">${result.suggestedSkills.map(s=>`<span style="background:#eef3fb;color:#1a3d70;border:1px solid #c5d6ee;border-radius:4px;padding:3px 9px;font-size:11px;font-weight:500;">${escHtml(s)}</span>`).join('')}</div>
+    </div>` : '';
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Classification Report — ${escHtml(tor.title)}</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; color: #1a2a40; background: #fff; }
+  @page { margin: 20mm 18mm; size: A4; }
+  @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+  .page { max-width: 800px; margin: 0 auto; padding: 32px; }
+  h2 { font-size: 18px; font-weight: 700; color: #003168; margin-bottom: 4px; }
+  h3 { font-size: 11px; font-weight: 700; color: #7a8ba0; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; }
+  table { width: 100%; border-collapse: collapse; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:20px;border-bottom:2px solid #003168;margin-bottom:24px;">
+    <div>
+      <div style="font-size:11px;font-weight:700;color:#003168;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;">UNOPS · TOR Classification Report</div>
+      <h2>${escHtml(tor.title)}</h2>
+      <div style="font-size:12px;color:#7a8ba0;margin-top:4px;">${escHtml(result.functionArea||tor.area||'')} · Classified ${classifiedDate}</div>
+    </div>
+    <div style="text-align:right;flex-shrink:0;margin-left:24px;">
+      <div style="font-size:36px;font-weight:800;color:#003168;line-height:1;">ICS ${result.classifiedLevel}</div>
+      <div style="font-size:11px;font-weight:700;color:${catColor};background:${isSupport?'#e3f2f8':'#e8f5e9'};padding:3px 10px;border-radius:4px;margin-top:6px;text-align:center;">${catLabel}</div>
+      ${hasTarget ? `<div style="font-size:10px;color:#6a1b9a;background:#f3e5f5;padding:2px 8px;border-radius:4px;margin-top:4px;">Target: ICS ${tor.targetICS}</div>` : ''}
+    </div>
+  </div>
+
+  <!-- CONFIDENCE -->
+  <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:${confBg[confLevel]};border-radius:8px;margin-bottom:20px;border:1px solid ${confDot[confLevel]}33;">
+    <span style="width:10px;height:10px;border-radius:50%;background:${confDot[confLevel]};flex-shrink:0;display:inline-block;"></span>
+    <span style="font-size:12px;font-weight:700;color:${confColors[confLevel]};">Confidence: ${confLevel}</span>
+    ${result.confidenceReason ? `<span style="font-size:12px;color:${confColors[confLevel]};font-weight:400;"> — ${escHtml(result.confidenceReason)}</span>` : ''}
+  </div>
+
+  <!-- JUSTIFICATION -->
+  <div style="padding:14px 16px;background:#e8f5e9;border-radius:8px;margin-bottom:24px;border:1px solid #c8e6c9;">
+    <div style="font-size:11px;font-weight:700;color:#2e7d32;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Classification Outcome</div>
+    <div style="font-size:13px;color:#1a2a40;line-height:1.7;">${escHtml(result.overallJustification)}</div>
+  </div>
+
+  <!-- FACTORS TABLE -->
+  <div style="margin-bottom:24px;">
+    <h3>Classification Factors</h3>
+    <table style="border:1px solid #e8ecf2;border-radius:8px;overflow:hidden;">
+      <thead>
+        <tr style="background:#f0f5ff;">
+          <th style="padding:9px 14px;text-align:left;font-size:10px;font-weight:700;color:#4a5568;text-transform:uppercase;letter-spacing:0.4px;border-bottom:2px solid #dde3ec;">Factor</th>
+          <th style="padding:9px 14px;text-align:left;font-size:10px;font-weight:700;color:#4a5568;text-transform:uppercase;letter-spacing:0.4px;border-bottom:2px solid #dde3ec;width:100px;">Verdict</th>
+          <th style="padding:9px 14px;text-align:left;font-size:10px;font-weight:700;color:#4a5568;text-transform:uppercase;letter-spacing:0.4px;border-bottom:2px solid #dde3ec;">Analysis</th>
+        </tr>
+      </thead>
+      <tbody>${factorRows}</tbody>
+    </table>
+  </div>
+
+  <!-- KEY VERBS -->
+  ${(result.keyVerbs||[]).length ? `
+  <div style="margin-bottom:24px;">
+    <h3>Key Action Verbs</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;">${result.keyVerbs.map(v=>`<span style="background:#f0f5ff;color:#1a3d70;border:1px solid #c5d6ee;border-radius:4px;padding:3px 9px;font-size:11px;font-weight:500;">${escHtml(v)}</span>`).join('')}</div>
+  </div>` : ''}
+
+  <!-- SKILLS -->
+  ${(tor.skills||[]).length ? `
+  <div style="margin-bottom:24px;">
+    <h3>Skills Listed in TOR</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;">${tor.skills.map(s=>`<span style="background:#eef3fb;color:#1a3d70;border:1px solid #c5d6ee;border-radius:4px;padding:3px 9px;font-size:11px;font-weight:500;">${escHtml(s)}</span>`).join('')}</div>
+  </div>` : ''}
+
+  ${invalidSkillsBlock}
+  ${suggestedSkillsBlock}
+  ${suggestionsBlock}
+  ${revisedPurposeBlock}
+  ${revisedFunctionsBlock}
+
+  <!-- FOOTER -->
+  <div style="margin-top:40px;padding-top:16px;border-top:1px solid #e0e5ec;display:flex;justify-content:space-between;align-items:center;">
+    <span style="font-size:10px;color:#aab4c0;">Generated by UNOPS TOR Classification Tool · ${new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'})}</span>
+    <span style="font-size:10px;color:#aab4c0;">Confidential — Internal Use Only</span>
+  </div>
+
+</div>
+</body>
+</html>`;
+
+  const w = window.open('', '_blank');
+  w.document.write(html);
+  w.document.close();
+  w.onload = () => { w.focus(); w.print(); };
+}
+
+/* ---- EXPORT TOR TEXT ---- */
 function exportTOR() {
   saveDraft();
   const tor = tors[currentTORId];
