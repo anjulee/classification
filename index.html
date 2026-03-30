@@ -690,32 +690,33 @@ JSON SCHEMA — respond with exactly this structure:
   "revisedFunctions": "<string or null>"
 }`;
 
-  // Store pending context
-  window._pendingTOR = { ...tor };
-  window._pendingTORId = currentTORId;
-  sendPrompt(prompt);
+  // Call the Anthropic API directly — the claude.ai proxy handles auth automatically
+  fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-6",
+      max_tokens: 2500,
+      messages: [{ role: "user", content: prompt }]
+    })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+    const raw = (data.content || []).map(c => c.text || "").join("");
+    // Store pending context before calling applyResult
+    window._pendingTOR = { ...tor };
+    window._pendingTORId = currentTORId;
+    applyResult(raw);
+  })
+  .catch(err => {
+    switchTab('analysis');
+    document.getElementById('analysis-result').innerHTML =
+      `<div class="callout warning"><span class="callout-icon">⚠</span><div class="callout-text"><strong>Analysis failed.</strong><br>${escHtml(err.message)}</div></div>`;
+  });
 }
 
-/* ---- RECEIVE RESULT FROM CHAT ---- */
-// Claude's JSON reply will appear in the conversation. We watch for it via storage ping
-// The user clicks "Apply to TOR" on the result that appears in chat — OR we auto-detect
-// via a message listener. For claude.ai artifacts, use window message events.
-window.addEventListener('message', function(e) {
-  if (!window._pendingTOR) return;
-  const payload = e.data;
-  // claude.ai sends assistant messages as { type: 'assistant_message', text: '...' }
-  // or sometimes the full text directly
-  let text = '';
-  if (typeof payload === 'string') text = payload;
-  else if (payload?.text) text = payload.text;
-  else if (payload?.content) text = payload.content;
-  else return;
-
-  if (!text.includes('classifiedLevel')) return;
-  applyResult(text);
-});
-
-// Expose globally so Claude can call window.applyTORResult(jsonString) directly from chat
+// Expose globally as fallback
 window.applyTORResult = applyResult;
 
 function applyResult(raw) {
