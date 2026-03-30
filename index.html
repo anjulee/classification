@@ -257,11 +257,23 @@
         <div class="tab-content" id="tab-skills">
           <div class="callout info">
             <span class="callout-icon">ℹ</span>
-            <span class="callout-text">Paste or type the skills for this TOR, one per line or separated by commas. The tool will check each one against the approved UNOPS Talent+Skills list and flag any that are not on it.</span>
+            <span class="callout-text">Search and select up to 9 skills from the approved UNOPS Talent+Skills list. Any skills not on the list will be flagged during classification.</span>
           </div>
-          <div class="form-group">
-            <label>Skills <span style="color:#9ab3d0; font-weight:400; text-transform:none; font-size:11px;">(max 9 — one per line or comma-separated)</span></label>
-            <textarea id="skills-raw" style="min-height:160px;" placeholder="e.g.&#10;HR Operations&#10;Data Analysis&#10;Recruitment&#10;Compliance Management" oninput="saveDraft()"></textarea>
+          <div style="position:relative; margin-bottom:10px;">
+            <input type="text" id="skill-search" placeholder="Search skills… e.g. Recruitment, Data Analysis, Procurement" oninput="filterSkills()" autocomplete="off"
+              style="width:100%; padding:9px 12px; border:1px solid #d0d8e4; border-radius:6px; font-size:13.5px; color:#1a2a40; font-family:inherit; background:#fafbfc;">
+            <div id="skill-dropdown" style="display:none; position:absolute; top:100%; left:0; right:0; background:#fff; border:1px solid #d0d8e4; border-top:none; border-radius:0 0 6px 6px; max-height:200px; overflow-y:auto; z-index:100; box-shadow:0 4px 12px rgba(0,0,0,0.08);"></div>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+            <span style="font-size:12px; font-weight:600; color:#4a5568; text-transform:uppercase; letter-spacing:0.4px;">Selected Skills</span>
+            <span id="skill-count-badge" style="font-size:11px; color:#7a8ba0;">0 / 9</span>
+          </div>
+          <div id="skill-chips" style="display:flex; flex-wrap:wrap; gap:6px; min-height:36px; padding:8px; background:#f8f9fc; border:1px solid #e0e5ec; border-radius:6px;">
+            <span id="skill-chips-placeholder" style="font-size:13px; color:#aab4c0; font-style:italic;">No skills selected yet — search above to add</span>
+          </div>
+          <div style="margin-top:14px;">
+            <div style="font-size:12px; font-weight:600; color:#4a5568; text-transform:uppercase; letter-spacing:0.4px; margin-bottom:8px;">Also paste / type free-form <span style="font-weight:400; color:#9ab3d0; text-transform:none;">(non-list skills will be flagged)</span></div>
+            <textarea id="skills-raw" style="min-height:60px;" placeholder="Optional: paste additional skills here" oninput="saveDraft()"></textarea>
           </div>
         </div>
 
@@ -419,9 +431,68 @@ function parseAndPopulateTOR(text, filename) {
 }
 
 /* ---- SKILLS ---- */
+const APPROVED_SKILLS = ["Administration","Administrative Management","Audit","Benefits Administration","Budget Analysis","Budget Management","Budget Monitoring","Budgeting","Business Administration","Capacity Building","Capacity Development","Change Management","Clerical Skills","Communication","Communication and Collaboration Tools","Communications Management","Communications Planning","Compliance","Compliance Management","Contract Administration","Contract Analysis","Contract Drafting","Contract Management","Contract Negotiation","Contract Review","Contracts","Data Analysis","Data Collection","Data Management","Data Reporting","Data Visualization","Document Management","Emergency Management","Event Management","Finance","Finance Accounting","Financial Management","Financial Reporting","General Administration","Government Procurement","HR Information Systems","HR Operations","HR Policies","Human Resources","Human Resources Analytics","Human Resources Business Partnering","Human Resources Information Systems","Human Resources Management","Human Resources Management Operations","Human Resources Operations","Human Resources Policies","Human Resources Software","Human Resources Strategy","Human Resources Support","Information Management","Inventory Management","Knowledge Management","Legal Advice","Legal Affairs","Legal Analysis","Legal Compliance","Legal Document Preparation","Legal Framework","Legal Operations","Legal Research","Legal Writing","Logistics","Logistics Management","Logistics Planning","Office Administration","Office Management","Operational Management","Operations Management","Payroll","Payroll Administration","Payroll Management","Performance Management","Personnel Administration","Personnel Management","Policy Analysis","Policy Development","Policy Implementation","Policy Research","Procurement","Procurement Contracts","Project Management","Project Management Body of Knowledge","Project Management Methodologies","Project Management Office","Project Management Support","Project Management Tools","Public Administration","Public Procurement","Quality Management","Recruitment","Recruitment Planning","Recruitment Strategies","Reporting","Risk Management","Security","Security Management","Stakeholder Management","Strategic Communications","Strategic Human Resource Planning","Strategic Procurement","Supply Chain Management","Talent Acquisition","Talent Development","Talent Management","Team Leadership","Team Management","Training","Training & Development","Training Coordination","Transportation","Travel Management","Vendor Management","Workforce Management"].sort();
+
+let selectedSkills = [];
+
+function filterSkills() {
+  const q = document.getElementById('skill-search').value.trim().toLowerCase();
+  const dd = document.getElementById('skill-dropdown');
+  if (!q) { dd.style.display = 'none'; return; }
+  const matches = APPROVED_SKILLS.filter(s => s.toLowerCase().includes(q) && !selectedSkills.includes(s)).slice(0, 25);
+  if (!matches.length) { dd.innerHTML = '<div style="padding:10px 14px;font-size:13px;color:#9ab3d0;">No matching skills found</div>'; }
+  else { dd.innerHTML = matches.map(s => `<div onclick="addSkill('${s.replace(/'/g,"\\'")}');this.parentNode.style.display='none';" style="padding:9px 14px;font-size:13px;color:#2c3e50;cursor:pointer;border-bottom:1px solid #f0f2f5;" onmouseover="this.style.background='#eef3fb'" onmouseout="this.style.background=''">${escHtml(s)}</div>`).join(''); }
+  dd.style.display = 'block';
+}
+
+function addSkill(skill) {
+  if (selectedSkills.length >= 9) { alert('Maximum 9 skills allowed.'); return; }
+  if (!selectedSkills.includes(skill)) { selectedSkills.push(skill); renderChips(); saveDraft(); }
+  document.getElementById('skill-search').value = '';
+  document.getElementById('skill-dropdown').style.display = 'none';
+}
+
+function removeSkill(skill) {
+  selectedSkills = selectedSkills.filter(s => s !== skill);
+  renderChips(); saveDraft();
+}
+
+function renderChips() {
+  const container = document.getElementById('skill-chips');
+  const placeholder = document.getElementById('skill-chips-placeholder');
+  document.getElementById('skill-count-badge').textContent = `${selectedSkills.length} / 9`;
+  if (!selectedSkills.length) {
+    container.innerHTML = '<span id="skill-chips-placeholder" style="font-size:13px;color:#aab4c0;font-style:italic;">No skills selected yet — search above to add</span>';
+    return;
+  }
+  container.innerHTML = selectedSkills.map(s =>
+    `<span style="display:inline-flex;align-items:center;gap:5px;background:#eef3fb;color:#1a3d70;border:1px solid #c5d6ee;border-radius:5px;padding:4px 10px;font-size:12px;font-weight:500;">
+      ${escHtml(s)}
+      <button onclick="removeSkill('${s.replace(/'/g,"\\'")}');event.stopPropagation();" style="background:none;border:none;cursor:pointer;color:#7a8ba0;font-size:13px;line-height:1;padding:0;" title="Remove">✕</button>
+    </span>`
+  ).join('');
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', e => {
+  if (!e.target.closest('#skill-search') && !e.target.closest('#skill-dropdown'))
+    document.getElementById('skill-dropdown').style.display = 'none';
+});
+
 function getSkillsFromTextarea() {
-  const raw = document.getElementById('skills-raw')?.value || '';
-  return raw.split(/[\n,]/).map(s => s.trim()).filter(Boolean).slice(0, 9);
+  // Combine chip-selected skills + any free-form text
+  const freeForm = (document.getElementById('skills-raw')?.value || '').split(/[\n,]/).map(s => s.trim()).filter(Boolean);
+  const all = [...selectedSkills, ...freeForm.filter(s => !selectedSkills.includes(s))];
+  return all.slice(0, 9);
+}
+
+function setSkillsFromSaved(skills) {
+  // Re-populate chips from saved data — approved skills go to chips, others to textarea
+  selectedSkills = skills.filter(s => APPROVED_SKILLS.includes(s));
+  const freeForm = skills.filter(s => !APPROVED_SKILLS.includes(s));
+  renderChips();
+  const ta = document.getElementById('skills-raw');
+  if (ta) ta.value = freeForm.join('\n');
 }
 
 /* ---- TABS ---- */
@@ -494,8 +565,7 @@ function loadTOR(id) {
   document.getElementById('edu-desired').value = tor.eduDesired || '';
   document.getElementById('exp-required').value = tor.expRequired || '';
   document.getElementById('exp-desired').value = tor.expDesired || '';
-  const skillsEl = document.getElementById('skills-raw');
-  if (skillsEl) skillsEl.value = (tor.skills || []).join('\n');
+  setSkillsFromSaved(tor.skills || []);
   renderLangTable(tor.languages || [{ lang: 'English', prof: 'Fluent', req: 'Required' }]);
   updateAreaTag(tor.area);
   document.getElementById('analysis-result').innerHTML = '';
@@ -694,6 +764,8 @@ Qualifications: ${tor.eduRequired || '(not provided)'}
 JSON SCHEMA — respond with exactly this structure:
 {
   "classifiedLevel": <number>,
+  "confidenceLevel": "High" | "Medium" | "Low",
+  "confidenceReason": "<one sentence explaining confidence level>",
   "functionArea": "<string>",
   "workCategory": "Support" or "Professional",
   "confidenceNote": "<short string>",
@@ -706,6 +778,7 @@ JSON SCHEMA — respond with exactly this structure:
   },
   "keyVerbs": ["<verb>"],
   "redFlags": ["<string>"],
+  "suggestedSkills": ["<up to 9 skills from the approved list that best match this TOR's function area and ICS level>"],
   "invalidSkills": [{ "skill": "<string>", "suggestedReplacement": "<string or null>" }],
   "suggestions": [{ "type": "modify"|"remove", "original": "<string>", "revised": "<string or null>", "reason": "<string>" }],
   "revisedRolePurpose": "<string or null>",
@@ -792,6 +865,23 @@ function renderResult(result, tor) {
   const vClass = { aligned:'verdict-aligned', above:'verdict-above', below:'verdict-below' };
   const hasTarget = !!tor.targetICS;
 
+  // Confidence styling
+  const confLevel = result.confidenceLevel || 'Medium';
+  const confStyles = {
+    High:   { bg:'#e8f5e9', color:'#1b5e20', dot:'#43a047' },
+    Medium: { bg:'#fff8e1', color:'#e65100', dot:'#ffa726' },
+    Low:    { bg:'#fce4ec', color:'#880e4f', dot:'#e91e63' }
+  };
+  const cs = confStyles[confLevel] || confStyles.Medium;
+  const confidenceHTML = `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;padding:12px 16px;background:${cs.bg};border-radius:8px;border:1px solid ${cs.dot}33;">
+      <span style="width:10px;height:10px;border-radius:50%;background:${cs.dot};flex-shrink:0;"></span>
+      <div>
+        <span style="font-size:13px;font-weight:700;color:${cs.color};">Confidence: ${confLevel}</span>
+        ${result.confidenceReason ? `<span style="font-size:13px;color:${cs.color};font-weight:400;"> — ${escHtml(result.confidenceReason)}</span>` : ''}
+      </div>
+    </div>`;
+
   const factorRows = [
     ['Nature of Work', result.factors?.natureOfWork],
     ['Working Environment', result.factors?.workingEnvironment],
@@ -814,6 +904,29 @@ function renderResult(result, tor) {
     <div class="callout warning">
       <span class="callout-icon">⚠</span>
       <div class="callout-text"><strong>Language flags:</strong><br>${result.redFlags.map(f=>`• ${escHtml(f)}`).join('<br>')}</div>
+    </div>` : '';
+
+  const invalidSkillsHTML = (result.invalidSkills||[]).length ? `
+    <div class="callout warning">
+      <span class="callout-icon">⚠</span>
+      <div class="callout-text">
+        <strong>Skills not on the approved Talent+Skills list:</strong><br>
+        ${result.invalidSkills.map(s =>
+          `• <strong>${escHtml(s.skill)}</strong>${s.suggestedReplacement ? ` → <em>${escHtml(s.suggestedReplacement)}</em>` : ' — no direct equivalent found'}`
+        ).join('<br>')}
+      </div>
+    </div>` : '';
+
+  const suggestedSkillsHTML = (result.suggestedSkills||[]).length ? `
+    <div class="suggestion-block" style="margin-bottom:16px;">
+      <div class="suggestion-title">Suggested Skills for this TOR</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;">
+        ${result.suggestedSkills.map(s => `
+          <span style="display:inline-flex;align-items:center;gap:5px;background:#eef3fb;color:#1a3d70;border:1px solid #c5d6ee;border-radius:5px;padding:4px 10px;font-size:12px;font-weight:500;cursor:pointer;" onclick="addSkillFromSuggestion('${s.replace(/'/g,"\\'")}');switchTab('skills');" title="Click to add to Skills tab">
+            + ${escHtml(s)}
+          </span>`).join('')}
+      </div>
+      <div style="font-size:11px;color:#9ab3d0;margin-top:8px;">Click any skill to add it to the Skills tab</div>
     </div>` : '';
 
   const suggestionsHTML = hasTarget && (result.suggestions||[]).length ? `
@@ -846,17 +959,6 @@ function renderResult(result, tor) {
       <span class="callout-text">No target ICS level set. To receive language improvement suggestions, select a target ICS level in the Position Information panel above and run the analysis again.</span>
     </div>` : '';
 
-  const invalidSkillsHTML = (result.invalidSkills||[]).length ? `
-    <div class="callout warning">
-      <span class="callout-icon">⚠</span>
-      <div class="callout-text">
-        <strong>Skills not on the approved Talent+Skills list:</strong><br>
-        ${result.invalidSkills.map(s =>
-          `• <strong>${escHtml(s.skill)}</strong>${s.suggestedReplacement ? ` → suggested replacement: <em>${escHtml(s.suggestedReplacement)}</em>` : ' — no direct equivalent found'}`
-        ).join('<br>')}
-      </div>
-    </div>` : '';
-
   document.getElementById('analysis-result').innerHTML = `
     <div class="result-header">
       <div class="ics-level-badge">ICS ${result.classifiedLevel}</div>
@@ -865,10 +967,11 @@ function renderResult(result, tor) {
         <div style="display:flex;gap:8px;align-items:center;margin-top:4px;flex-wrap:wrap;">
           <span style="background:${catBg};color:${catColor};font-size:11px;font-weight:700;padding:2px 9px;border-radius:4px;text-transform:uppercase;letter-spacing:0.4px;">${result.workCategory}</span>
           ${hasTarget ? `<span style="background:#f3e5f5;color:#6a1b9a;font-size:11px;font-weight:700;padding:2px 9px;border-radius:4px;text-transform:uppercase;letter-spacing:0.4px;">Target: ICS ${tor.targetICS}</span>` : ''}
-          <span style="font-size:13px;color:#5a6a7e;">${escHtml(result.confidenceNote||'')}</span>
         </div>
       </div>
     </div>
+
+    ${confidenceHTML}
 
     <div class="callout success">
       <span class="callout-icon">✓</span>
@@ -877,6 +980,7 @@ function renderResult(result, tor) {
 
     ${redFlagsHTML}
     ${invalidSkillsHTML}
+    ${suggestedSkillsHTML}
     ${verbsHTML}
 
     <table class="classification-table">
@@ -889,6 +993,10 @@ function renderResult(result, tor) {
     ${revisedPurposeHTML}
     ${revisedFunctionsHTML}
   `;
+}
+
+function addSkillFromSuggestion(skill) {
+  addSkill(skill);
 }
 
 /* ---- EXPORT ---- */
