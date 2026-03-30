@@ -8,17 +8,12 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #1a1a2e; min-height: 100vh; }
 
-  /* HEADER */
   .header { background: #003168; color: #fff; padding: 16px 24px; display: flex; align-items: center; gap: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
   .header-logo { background: #fff; border-radius: 4px; padding: 4px 8px; font-weight: 800; font-size: 13px; color: #003168; letter-spacing: 0.5px; }
-  .header h1 { font-size: 17px; font-weight: 600; letter-spacing: 0.2px; }
-  .header-sub { font-size: 12px; color: #9ab3d0; margin-top: 1px; }
 
-  /* LAYOUT */
   .app { display: grid; grid-template-columns: 260px 1fr; min-height: calc(100vh - 58px); }
 
-  /* SIDEBAR */
-  .sidebar { background: #fff; border-right: 1px solid #e0e5ec; padding: 0; overflow-y: auto; }
+  .sidebar { background: #fff; border-right: 1px solid #e0e5ec; overflow-y: auto; }
   .sidebar-section { padding: 12px 16px 8px; }
   .sidebar-title { font-size: 10px; font-weight: 700; color: #7a8ba0; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
   .tor-item { padding: 9px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; color: #2c3e50; border: 1px solid transparent; margin-bottom: 3px; transition: all 0.15s; display: flex; flex-direction: column; gap: 2px; }
@@ -26,74 +21,72 @@
   .tor-item.active { background: #e8f0fb; border-color: #3a7bd5; color: #1a3d70; }
   .tor-item-title { font-weight: 600; font-size: 12.5px; }
   .tor-item-meta { font-size: 11px; color: #7a8ba0; }
-  .ics-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 3px; margin-left: 5px; }
+  .ics-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 3px; margin-left: 4px; }
   .ics-support { background: #e3f2f8; color: #1565a3; }
   .ics-professional { background: #e8f5e9; color: #2e7d32; }
   .ics-pending { background: #fff3e0; color: #e65100; }
-  .sidebar-divider { height: 1px; background: #e8ecf0; margin: 8px 16px; }
   .btn-new-tor { display: flex; align-items: center; gap: 7px; padding: 10px 16px; margin: 10px 12px; border-radius: 7px; background: #003168; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; border: none; width: calc(100% - 24px); justify-content: center; transition: background 0.15s; }
   .btn-new-tor:hover { background: #004a9e; }
 
-  /* MAIN CONTENT */
-  .main { padding: 24px 28px; overflow-y: auto; }
-  .welcome { background: #fff; border-radius: 10px; border: 1px solid #dde3ec; padding: 36px 40px; text-align: center; max-width: 620px; margin: 40px auto; }
+  .main { padding: 24px 28px; overflow-y: auto; max-height: calc(100vh - 58px); }
+
+  .welcome { background: #fff; border-radius: 10px; border: 1px solid #dde3ec; padding: 36px 40px; text-align: center; max-width: 600px; margin: 40px auto; }
   .welcome h2 { font-size: 20px; color: #003168; font-weight: 700; margin-bottom: 10px; }
   .welcome p { font-size: 14px; color: #5a6a7e; line-height: 1.7; margin-bottom: 18px; }
-  .welcome-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-  .btn-primary { background: #003168; color: #fff; border: none; padding: 10px 22px; border-radius: 7px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
-  .btn-primary:hover { background: #004a9e; }
-  .btn-secondary { background: #fff; color: #003168; border: 1.5px solid #003168; padding: 9px 20px; border-radius: 7px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
-  .btn-secondary:hover { background: #f0f5ff; }
 
-  /* EDITOR / INPUT PANEL */
   .panel { background: #fff; border-radius: 10px; border: 1px solid #dde3ec; margin-bottom: 18px; overflow: hidden; }
   .panel-header { padding: 14px 20px; border-bottom: 1px solid #e8ecf2; display: flex; align-items: center; justify-content: space-between; }
   .panel-title { font-size: 14px; font-weight: 700; color: #1a2a40; }
   .panel-body { padding: 20px; }
 
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-  .form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 0; }
-  .form-group.full { grid-column: 1/-1; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
   label { font-size: 12px; font-weight: 600; color: #4a5568; text-transform: uppercase; letter-spacing: 0.4px; }
   input[type=text], select, textarea { border: 1px solid #d0d8e4; border-radius: 6px; padding: 9px 12px; font-size: 13.5px; color: #1a2a40; font-family: inherit; background: #fafbfc; transition: border 0.15s; width: 100%; }
   input[type=text]:focus, select:focus, textarea:focus { border-color: #3a7bd5; outline: none; background: #fff; }
   textarea { resize: vertical; min-height: 120px; line-height: 1.6; }
-  .textarea-lg { min-height: 200px; }
 
-  /* TABS */
-  .tab-bar { display: flex; border-bottom: 1px solid #e8ecf2; padding: 0 20px; }
-  .tab { padding: 12px 18px; font-size: 13px; font-weight: 600; color: #7a8ba0; cursor: pointer; border-bottom: 2.5px solid transparent; margin-bottom: -1px; transition: all 0.15s; white-space: nowrap; }
+  .tab-bar { display: flex; border-bottom: 1px solid #e8ecf2; padding: 0 20px; overflow-x: auto; }
+  .tab { padding: 12px 16px; font-size: 13px; font-weight: 600; color: #7a8ba0; cursor: pointer; border-bottom: 2.5px solid transparent; margin-bottom: -1px; transition: all 0.15s; white-space: nowrap; }
   .tab:hover { color: #003168; }
   .tab.active { color: #003168; border-bottom-color: #003168; }
   .tab-content { padding: 24px; display: none; }
   .tab-content.active { display: block; }
 
-  /* MODE SELECTOR */
-  .mode-selector { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-  .mode-btn { padding: 9px 18px; border-radius: 7px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1.5px solid #d0d8e4; color: #5a6a7e; background: #fff; transition: all 0.15s; }
-  .mode-btn:hover { border-color: #3a7bd5; color: #003168; }
-  .mode-btn.active { background: #003168; color: #fff; border-color: #003168; }
+  /* UPLOAD ZONE */
+  .upload-zone { border: 2px dashed #c5d6ee; border-radius: 10px; padding: 32px; text-align: center; cursor: pointer; transition: all 0.2s; background: #f8faff; }
+  .upload-zone:hover, .upload-zone.drag-over { border-color: #3a7bd5; background: #eef3fb; }
+  .upload-zone-icon { font-size: 36px; margin-bottom: 12px; }
+  .upload-zone-title { font-size: 15px; font-weight: 600; color: #1a2a40; margin-bottom: 6px; }
+  .upload-zone-sub { font-size: 13px; color: #7a8ba0; }
+  .upload-zone input[type=file] { display: none; }
+  .upload-success { background: #e8f5e9; border-color: #66bb6a; }
+  .upload-success .upload-zone-title { color: #2e7d32; }
 
-  /* RESULT PANELS */
-  .result-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-  .ics-level-badge { font-size: 28px; font-weight: 800; color: #003168; background: #e8f0fb; padding: 8px 18px; border-radius: 8px; letter-spacing: -0.5px; }
-  .result-title { font-size: 17px; font-weight: 700; color: #1a2a40; }
+  .or-divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; color: #9ab3d0; font-size: 13px; font-weight: 600; }
+  .or-divider::before, .or-divider::after { content: ''; flex: 1; height: 1px; background: #e0e5ec; }
+
+  /* RESULTS */
+  .result-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  .ics-level-badge { font-size: 26px; font-weight: 800; color: #003168; background: #e8f0fb; padding: 8px 16px; border-radius: 8px; }
+  .result-title { font-size: 16px; font-weight: 700; color: #1a2a40; }
   .result-subtitle { font-size: 13px; color: #5a6a7e; }
 
   .classification-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 20px; }
   .classification-table th { background: #f0f5ff; padding: 9px 14px; text-align: left; font-size: 11px; font-weight: 700; color: #4a5568; text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 2px solid #dde3ec; }
   .classification-table td { padding: 11px 14px; border-bottom: 1px solid #edf0f5; vertical-align: top; }
   .classification-table tr:last-child td { border-bottom: none; }
-  .classification-table .factor-name { font-weight: 600; color: #003168; width: 160px; min-width: 140px; }
-  .classification-table .factor-verdict { width: 90px; }
+  .classification-table .factor-name { font-weight: 600; color: #003168; width: 170px; min-width: 140px; }
+  .classification-table .factor-verdict { width: 100px; }
   .verdict-pill { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 12px; }
   .verdict-aligned { background: #e8f5e9; color: #1b5e20; }
   .verdict-above { background: #fff3e0; color: #e65100; }
   .verdict-below { background: #fce4ec; color: #880e4f; }
 
-  .suggestion-block { background: #f8f9fc; border: 1px solid #e0e5ec; border-radius: 8px; padding: 15px 18px; margin-bottom: 12px; }
-  .suggestion-title { font-size: 12px; font-weight: 700; color: #7a8ba0; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
-  .suggestion-item { font-size: 13px; color: #2c3e50; margin-bottom: 6px; line-height: 1.6; padding-left: 14px; position: relative; }
+  .suggestion-block { background: #f8f9fc; border: 1px solid #e0e5ec; border-radius: 8px; padding: 16px 18px; margin-bottom: 12px; }
+  .suggestion-title { font-size: 12px; font-weight: 700; color: #7a8ba0; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+  .suggestion-item { font-size: 13px; color: #2c3e50; margin-bottom: 10px; line-height: 1.6; padding-left: 16px; position: relative; padding-bottom: 10px; border-bottom: 1px solid #edf0f5; }
+  .suggestion-item:last-child { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
   .suggestion-item::before { content: '→'; position: absolute; left: 0; color: #3a7bd5; font-weight: 700; }
   .suggestion-item.remove::before { content: '✕'; color: #c0392b; }
 
@@ -101,74 +94,40 @@
   .callout.info { background: #e3f2fd; border: 1px solid #bbdefb; }
   .callout.warning { background: #fff8e1; border: 1px solid #ffecb3; }
   .callout.success { background: #e8f5e9; border: 1px solid #c8e6c9; }
-  .callout-icon { font-size: 16px; margin-top: 1px; }
+  .callout-icon { font-size: 15px; margin-top: 1px; flex-shrink: 0; }
   .callout-text { font-size: 13px; color: #2c3e50; line-height: 1.6; }
 
-  .tor-output { background: #f8f9fc; border: 1px solid #e0e5ec; border-radius: 8px; padding: 20px; font-size: 13px; line-height: 1.8; color: #1a2a40; }
-  .tor-output h3 { font-size: 13px; font-weight: 700; color: #003168; margin: 14px 0 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-  .tor-output h3:first-child { margin-top: 0; }
-  .tor-output p { margin-bottom: 8px; }
-  .tor-output ul { padding-left: 18px; margin-bottom: 10px; }
-  .tor-output li { margin-bottom: 4px; }
-  .tor-section-divider { border: none; border-top: 1px solid #e0e5ec; margin: 14px 0; }
-
-  /* ACTION BAR */
-  .action-bar { display: flex; gap: 10px; padding: 14px 20px; background: #f8f9fc; border-top: 1px solid #e8ecf2; }
+  .action-bar { display: flex; gap: 10px; padding: 14px 20px; background: #f8f9fc; border-top: 1px solid #e8ecf2; flex-wrap: wrap; align-items: center; }
   .btn-run { padding: 10px 24px; background: #003168; color: #fff; border: none; border-radius: 7px; font-size: 14px; font-weight: 700; cursor: pointer; transition: background 0.15s; }
   .btn-run:hover { background: #004a9e; }
   .btn-run:disabled { background: #9ab3d0; cursor: not-allowed; }
-  .btn-outline { padding: 9px 18px; background: #fff; color: #003168; border: 1.5px solid #c5d6ee; border-radius: 7px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
-  .btn-outline:hover { background: #f0f5ff; }
-  .btn-danger { padding: 9px 18px; background: #fff; color: #c0392b; border: 1.5px solid #f5c6cb; border-radius: 7px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+  .btn-danger { padding: 7px 14px; background: #fff; color: #c0392b; border: 1.5px solid #f5c6cb; border-radius: 7px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
   .btn-danger:hover { background: #fdf3f3; }
-  .btn-export { padding: 9px 18px; background: #fff; color: #155724; border: 1.5px solid #b8d6be; border-radius: 7px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+  .btn-export { padding: 7px 14px; background: #fff; color: #155724; border: 1.5px solid #b8d6be; border-radius: 7px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
   .btn-export:hover { background: #f0f9f3; }
+  .btn-primary { background: #003168; color: #fff; border: none; padding: 10px 22px; border-radius: 7px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+  .btn-primary:hover { background: #004a9e; }
 
-  /* LOADING */
   .loading-state { text-align: center; padding: 40px 20px; }
   .spinner { width: 36px; height: 36px; border: 3px solid #e8ecf2; border-top-color: #003168; border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 16px; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .loading-text { font-size: 14px; color: #5a6a7e; }
 
-  /* EMPTY STATE */
   .empty { padding: 30px; text-align: center; color: #7a8ba0; font-size: 13px; }
 
-  /* SKILLS CHIPS */
-  .skills-container { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
-  .skill-chip { display: inline-flex; align-items: center; gap: 5px; background: #eef3fb; color: #1a3d70; border: 1px solid #c5d6ee; border-radius: 5px; padding: 4px 10px; font-size: 12px; font-weight: 500; }
-  .skill-chip button { background: none; border: none; color: #7a8ba0; cursor: pointer; font-size: 13px; line-height: 1; padding: 0; }
-  .skill-chip button:hover { color: #c0392b; }
-  .skill-search { border: 1px solid #d0d8e4; border-radius: 6px; padding: 7px 12px; font-size: 13px; width: 100%; margin-bottom: 8px; font-family: inherit; }
-  .skill-search:focus { border-color: #3a7bd5; outline: none; }
-  .skill-dropdown { border: 1px solid #d0d8e4; border-radius: 6px; max-height: 160px; overflow-y: auto; background: #fff; }
-  .skill-option { padding: 8px 12px; font-size: 13px; cursor: pointer; color: #2c3e50; border-bottom: 1px solid #f0f2f5; }
-  .skill-option:last-child { border-bottom: none; }
-  .skill-option:hover { background: #eef3fb; }
-
-  /* QUALIFICATIONS */
-  .qual-row { display: flex; gap: 10px; margin-bottom: 8px; align-items: flex-start; }
-  .qual-row input { flex: 1; }
-  .qual-type { width: 110px; flex-shrink: 0; }
-  .req-des { width: 100px; flex-shrink: 0; }
-
-  /* LANGUAGE TABLE */
   .lang-table { width: 100%; border-collapse: collapse; font-size: 13px; }
   .lang-table th { font-size: 11px; font-weight: 700; color: #4a5568; text-transform: uppercase; padding: 6px 10px; background: #f8f9fc; border: 1px solid #e8ecf2; }
   .lang-table td { padding: 7px 10px; border: 1px solid #e8ecf2; }
-  .lang-table select, .lang-table input { border: none; background: transparent; font-size: 13px; padding: 2px 0; }
+  .lang-table select, .lang-table input { border: none; background: transparent; font-size: 13px; padding: 2px 0; width: 100%; }
   .btn-add-row { font-size: 12px; color: #3a7bd5; cursor: pointer; background: none; border: none; padding: 4px 0; font-family: inherit; margin-top: 6px; }
   .btn-add-row:hover { text-decoration: underline; }
 
-  /* RESPONSIVE */
+  .area-tag { display: inline-block; background: #f0f5ff; color: #1a3d70; border: 1px solid #c5d6ee; border-radius: 4px; padding: 2px 8px; font-size: 12px; font-weight: 600; margin-left: 8px; }
+
   @media (max-width: 860px) {
     .app { grid-template-columns: 1fr; }
     .sidebar { display: none; }
     .form-row { grid-template-columns: 1fr; }
   }
-
-  /* POSITION INFO GRID */
-  .pos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .pos-grid .full { grid-column: 1/-1; }
 </style>
 </head>
 <body>
@@ -177,61 +136,58 @@
   <div class="header-logo">UNOPS</div>
   <div>
     <div style="font-size:16px; font-weight:700;">TOR Classification Tool</div>
-    <div class="header-sub">AI-powered · ICS Level 1–14 · ICSC Methodology</div>
+    <div style="font-size:12px; color:#9ab3d0; margin-top:1px;">AI-powered · ICS Level 1–14 · ICSC Methodology</div>
   </div>
 </div>
 
 <div class="app">
 
-  <!-- SIDEBAR -->
   <div class="sidebar" id="sidebar">
     <div style="padding: 12px;">
       <button class="btn-new-tor" onclick="newTOR()">+ New TOR</button>
     </div>
     <div class="sidebar-section">
       <div class="sidebar-title">Saved TORs</div>
-      <div id="tor-list">
-        <div class="empty">No TORs saved yet.<br>Create your first above.</div>
-      </div>
+      <div id="tor-list"><div class="empty">No TORs saved yet.<br>Create your first above.</div></div>
     </div>
   </div>
 
-  <!-- MAIN -->
   <div class="main" id="main-content">
 
-    <!-- WELCOME STATE -->
+    <!-- WELCOME -->
     <div class="welcome" id="welcome-state">
-      <div style="font-size: 40px; margin-bottom: 12px;">📋</div>
+      <div style="font-size:40px; margin-bottom:12px;">📋</div>
       <h2>UNOPS TOR Classification Tool</h2>
-      <p>Draft, classify, and refine Terms of Reference against the ICSC/ICS methodology. Powered by Claude AI.</p>
-      <p style="font-size: 13px; color: #7a8ba0;">The tool uses the UNOPS ICS Level framework, standard TOR library, and classification factors (Nature of Work, Working Environment, Partnerships, Results-Impact) to provide structured analysis and language recommendations.</p>
-      <div class="welcome-actions">
-        <button class="btn-primary" onclick="newTOR()">Create New TOR</button>
-      </div>
+      <p>Upload a TOR document or draft one from scratch. The tool classifies against the ICSC/ICS methodology and suggests language improvements.</p>
+      <p style="font-size:13px; color:#7a8ba0;">Classification uses the four ICSC factors: Nature of Work, Working Environment, Partnerships, and Results-Impact Radius.</p>
+      <button class="btn-primary" style="margin-top:8px;" onclick="newTOR()">Get Started</button>
     </div>
 
-    <!-- EDITOR STATE (hidden by default) -->
+    <!-- EDITOR -->
     <div id="editor-state" style="display:none;">
 
-      <!-- POSITION INFO PANEL -->
+      <!-- POSITION INFO -->
       <div class="panel">
         <div class="panel-header">
-          <span class="panel-title">I. Position Information</span>
+          <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+            <span class="panel-title">Position Information</span>
+            <span id="area-tag-display" class="area-tag" style="display:none;"></span>
+          </div>
           <div style="display:flex; gap:8px;">
-            <button class="btn-danger" onclick="deleteTOR()" style="font-size:12px; padding:5px 12px;">Delete</button>
-            <button class="btn-export" onclick="exportTOR()" style="font-size:12px; padding:5px 12px;">Export TOR</button>
+            <button class="btn-danger" onclick="deleteTOR()">Delete</button>
+            <button class="btn-export" onclick="exportTOR()">Export TOR</button>
           </div>
         </div>
         <div class="panel-body">
-          <div class="pos-grid">
+          <div class="form-row" style="margin-bottom:14px;">
             <div class="form-group">
               <label>Position Title</label>
               <input type="text" id="pos-title" placeholder="e.g. HR Senior Associate" oninput="saveDraft()">
             </div>
             <div class="form-group">
-              <label>Target ICS Level (optional)</label>
+              <label>Target ICS Level <span style="color:#9ab3d0; font-weight:400; text-transform:none; font-size:11px;">(optional — leave blank to auto-classify)</span></label>
               <select id="pos-target-ics" onchange="saveDraft()">
-                <option value="">-- Auto-classify --</option>
+                <option value="">— No target, auto-classify —</option>
                 <option value="1">ICS 1</option><option value="2">ICS 2</option><option value="3">ICS 3</option>
                 <option value="4">ICS 4</option><option value="5">ICS 5</option><option value="6">ICS 6</option>
                 <option value="7">ICS 7</option><option value="8">ICS 8</option><option value="9">ICS 9</option>
@@ -239,57 +195,45 @@
                 <option value="13">ICS 13</option><option value="14">ICS 14</option>
               </select>
             </div>
-            <div class="form-group">
-              <label>Position Area / Function</label>
-              <input type="text" id="pos-area" placeholder="e.g. Human Resources" oninput="saveDraft()">
-            </div>
-            <div class="form-group">
-              <label>Organizational Unit</label>
-              <input type="text" id="pos-unit" placeholder="e.g. Regional Office, HQ" oninput="saveDraft()">
-            </div>
-            <div class="form-group full">
-              <label>Duty Station</label>
-              <input type="text" id="pos-station" placeholder="e.g. Geneva, Switzerland" oninput="saveDraft()">
-            </div>
           </div>
         </div>
       </div>
 
-      <!-- TOR CONTENT PANEL -->
+      <!-- TOR CONTENT -->
       <div class="panel">
         <div class="tab-bar">
-          <div class="tab active" onclick="switchTab('context')">Org. Context</div>
-          <div class="tab" onclick="switchTab('functions')">Functions</div>
+          <div class="tab active" onclick="switchTab('upload')">Upload / Edit</div>
           <div class="tab" onclick="switchTab('skills')">Skills</div>
           <div class="tab" onclick="switchTab('qualifications')">Qualifications</div>
           <div class="tab" onclick="switchTab('languages')">Languages</div>
         </div>
 
-        <!-- CONTEXT TAB -->
-        <div class="tab-content active" id="tab-context">
+        <!-- UPLOAD TAB -->
+        <div class="tab-content active" id="tab-upload">
+          <div id="upload-zone-wrapper">
+            <label for="file-input">
+              <div class="upload-zone" id="upload-zone">
+                <div class="upload-zone-icon">📄</div>
+                <div class="upload-zone-title">Upload TOR document</div>
+                <div class="upload-zone-sub">Drag &amp; drop a .docx or .txt file, or click to browse</div>
+              </div>
+            </label>
+            <input type="file" id="file-input" accept=".docx,.txt,.doc" onchange="handleFileUpload(this)">
+          </div>
+
+          <div class="or-divider">or draft manually</div>
+
           <div class="form-group" style="margin-bottom:16px;">
             <label>Job Highlight</label>
-            <textarea id="job-highlight" placeholder="Concise summary of core responsibilities and key contributions (1-2 sentences)" oninput="saveDraft()"></textarea>
+            <textarea id="job-highlight" placeholder="Concise summary of core responsibilities and key contributions (1–2 sentences)" oninput="saveDraft()" style="min-height:60px;"></textarea>
           </div>
           <div class="form-group" style="margin-bottom:16px;">
             <label>Role Purpose</label>
-            <textarea class="textarea-lg" id="role-purpose" placeholder="Under the direction of [reporting line], the [position title]..." oninput="saveDraft()"></textarea>
-          </div>
-          <div class="form-group">
-            <label>Job-Specific Context (optional)</label>
-            <textarea id="job-context" placeholder="Specific background on the project, team, or environment relevant to this role..." oninput="saveDraft()"></textarea>
-          </div>
-        </div>
-
-        <!-- FUNCTIONS TAB -->
-        <div class="tab-content" id="tab-functions">
-          <div class="callout info">
-            <span class="callout-icon">ℹ</span>
-            <span class="callout-text">Use third-person language throughout. Group tasks under thematic headings. The language (action verbs) and scope of tasks are the primary classification signal.</span>
+            <textarea id="role-purpose" placeholder="Under the direction of [reporting line], the [position title]..." oninput="saveDraft()" style="min-height:100px;"></textarea>
           </div>
           <div class="form-group">
             <label>Functions / Key Results Expected</label>
-            <textarea class="textarea-lg" id="functions" style="min-height:300px;" placeholder="Group tasks under thematic headings, e.g.:&#10;&#10;HR Service Implementation&#10;&#10;Assists the HR Lead in monitoring contract statuses and preparing contract renewals.&#10;Maintains attendance registers, leave records, and other relevant reports.&#10;Tracks and monitors daily tasks to ensure efficient administration.&#10;&#10;Knowledge Building and Sharing&#10;&#10;Actively participates in HR-related training and capacity-building initiatives.&#10;Contributes to knowledge networks and Communities of Practice (CoPs)." oninput="saveDraft()"></textarea>
+            <textarea id="functions" oninput="saveDraft()" style="min-height:260px;" placeholder="Group tasks under thematic headings, e.g.:&#10;&#10;HR Service Implementation&#10;&#10;Assists the HR Lead in monitoring contract statuses and preparing contract renewals.&#10;Maintains attendance registers, leave records, and other relevant reports.&#10;&#10;Knowledge Building and Sharing&#10;&#10;Actively participates in HR-related training and capacity-building initiatives."></textarea>
           </div>
         </div>
 
@@ -297,86 +241,53 @@
         <div class="tab-content" id="tab-skills">
           <div class="callout info">
             <span class="callout-icon">ℹ</span>
-            <span class="callout-text">Select up to 9 skills from the approved UNOPS Talent+Skills list. Only listed skills may be used in the TOR.</span>
+            <span class="callout-text">Paste or type the skills for this TOR, one per line or separated by commas. The tool will check each one against the approved UNOPS Talent+Skills list and flag any that are not on it.</span>
           </div>
-          <input type="text" class="skill-search" id="skill-search" placeholder="Search skills list (e.g. HR Operations, Data Analysis, Procurement)..." oninput="filterSkills()">
-          <div class="skill-dropdown" id="skill-dropdown" style="display:none;"></div>
-          <div style="margin-top:12px;">
-            <label style="font-size:12px; font-weight:600; color:#4a5568; text-transform:uppercase; letter-spacing:0.4px; display:block; margin-bottom:6px;">Selected Skills (<span id="skill-count">0</span>/9)</label>
-            <div class="skills-container" id="selected-skills"></div>
+          <div class="form-group">
+            <label>Skills <span style="color:#9ab3d0; font-weight:400; text-transform:none; font-size:11px;">(max 9 — one per line or comma-separated)</span></label>
+            <textarea id="skills-raw" style="min-height:160px;" placeholder="e.g.&#10;HR Operations&#10;Data Analysis&#10;Recruitment&#10;Compliance Management" oninput="saveDraft()"></textarea>
           </div>
         </div>
 
         <!-- QUALIFICATIONS TAB -->
         <div class="tab-content" id="tab-qualifications">
-          <div class="form-group" style="margin-bottom:18px;">
+          <div class="form-group" style="margin-bottom:16px;">
             <label>Education — Required</label>
             <textarea id="edu-required" placeholder="Secondary school (or equivalent) with X years of relevant experience&#10;OR&#10;Bachelor's degree (or equivalent) in [field] with X years of relevant experience is required." oninput="saveDraft()"></textarea>
           </div>
-          <div class="form-group" style="margin-bottom:18px;">
+          <div class="form-group" style="margin-bottom:16px;">
             <label>Education — Desired</label>
-            <textarea id="edu-desired" placeholder="A globally or nationally recognized professional certificate in [field] is desired." oninput="saveDraft()"></textarea>
+            <textarea id="edu-desired" placeholder="A globally or nationally recognised professional certificate in [field] is desired." oninput="saveDraft()" style="min-height:80px;"></textarea>
           </div>
-          <div class="form-group" style="margin-bottom:18px;">
+          <div class="form-group" style="margin-bottom:16px;">
             <label>Experience — Required</label>
-            <textarea id="exp-required" placeholder="Relevant experience is work in [area].&#10;&#10;Experience in the use of collaboration and productivity tools (e.g. MS Office, G-Suite, etc) and web-based management systems is required." oninput="saveDraft()"></textarea>
+            <textarea id="exp-required" placeholder="Relevant experience is work in [area].&#10;&#10;Experience in the use of collaboration and productivity tools (e.g. MS Office, G-Suite) and web-based management systems is required." oninput="saveDraft()"></textarea>
           </div>
           <div class="form-group">
             <label>Experience — Desired</label>
-            <textarea id="exp-desired" placeholder="Experience of working in multicultural environments or UN system organizations is desired.&#10;&#10;Experience in development or humanitarian contexts is desired." oninput="saveDraft()"></textarea>
+            <textarea id="exp-desired" placeholder="Experience of working in multicultural environments or UN system organisations is desired." oninput="saveDraft()" style="min-height:80px;"></textarea>
           </div>
         </div>
 
         <!-- LANGUAGES TAB -->
         <div class="tab-content" id="tab-languages">
-          <label style="font-size:12px; font-weight:600; color:#4a5568; text-transform:uppercase; letter-spacing:0.4px; display:block; margin-bottom:10px;">Language Requirements</label>
           <table class="lang-table" id="lang-table">
-            <thead>
-              <tr>
-                <th>Language</th>
-                <th>Proficiency Level</th>
-                <th>Required/Desired</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody id="lang-rows">
-              <tr>
-                <td><input type="text" value="English" style="width:100%; border:none; background:transparent; font-size:13px; font-family:inherit;"></td>
-                <td><select style="width:100%; border:none; background:transparent; font-size:13px; font-family:inherit;"><option>Fluent</option><option>Advanced</option><option>Intermediate</option><option>Basic</option></select></td>
-                <td><select style="width:100%; border:none; background:transparent; font-size:13px; font-family:inherit;"><option>Required</option><option>Desired</option></select></td>
-                <td></td>
-              </tr>
-              <tr>
-                <td><input type="text" value="Any national language of the duty station" style="width:100%; border:none; background:transparent; font-size:13px; font-family:inherit;"></td>
-                <td><select style="width:100%; border:none; background:transparent; font-size:13px; font-family:inherit;"><option>Fluent</option><option>Advanced</option><option>Intermediate</option><option>Basic</option></select></td>
-                <td><select style="width:100%; border:none; background:transparent; font-size:13px; font-family:inherit;"><option>Required</option><option>Desired</option></select></td>
-                <td><button onclick="removeLangRow(this)" style="background:none;border:none;cursor:pointer;color:#c0392b;font-size:14px;">✕</button></td>
-              </tr>
-            </tbody>
+            <thead><tr><th>Language</th><th>Proficiency Level</th><th>Required/Desired</th><th></th></tr></thead>
+            <tbody id="lang-rows"></tbody>
           </table>
           <button class="btn-add-row" onclick="addLangRow()">+ Add language</button>
         </div>
       </div>
 
-      <!-- ANALYSIS PANEL -->
+      <!-- CLASSIFICATION ANALYSIS -->
       <div class="panel">
         <div class="panel-header">
           <span class="panel-title">Classification Analysis</span>
         </div>
-        <div>
-          <div style="padding: 16px 20px 8px;">
-            <div class="mode-selector">
-              <button class="mode-btn active" id="mode-classify" onclick="setMode('classify')">Classify TOR</button>
-              <button class="mode-btn" id="mode-suggest" onclick="setMode('suggest')">Suggest Improvements</button>
-              <button class="mode-btn" id="mode-align" onclick="setMode('align')">Align to Target Level</button>
-            </div>
-          </div>
-          <div class="action-bar">
-            <button class="btn-run" id="run-btn" onclick="runAnalysis()">▶ Run Analysis</button>
-            <span style="font-size:12px; color:#7a8ba0; margin-left:4px;" id="mode-description">Classify this TOR to determine its ICS level with justification</span>
-          </div>
+        <div class="action-bar">
+          <button class="btn-run" id="run-btn" onclick="runAnalysis()">▶ Classify &amp; Analyse</button>
+          <span style="font-size:12px; color:#7a8ba0;" id="mode-hint">Classifies the TOR and suggests language improvements</span>
         </div>
-
         <div id="analysis-result" style="padding: 0 20px 20px; display:none;"></div>
       </div>
 
@@ -384,120 +295,171 @@
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <script>
-const API_URL = "https://api.anthropic.com/v1/messages";
-let currentMode = 'classify';
 let currentTORId = null;
 let tors = {};
 
-const APPROVED_SKILLS = [
-  "Administration","Administrative Management","Audit","Benefit Administration","Benefits Administration",
-  "Budget Analysis","Budget Management","Budget Monitoring","Budgeting","Business Administration",
-  "Capacity Building","Capacity Development","Change Management","Clerical Skills","Communication",
-  "Communication and Collaboration Tools","Communications Management","Communications Planning",
-  "Compliance","Compliance Management","Contract Administration","Contract Analysis","Contract Drafting",
-  "Contract Management","Contract Negotiation","Contract Review","Contracts","Data Analysis",
-  "Data Collection","Data Management","Data Reporting","Data Visualization","Document Management",
-  "Emergency Management","Event Management","Finance","Finance Accounting","Financial Management",
-  "Financial Reporting","General Administration","Government Procurement","Human Resources",
-  "Human Resources Analytics","Human Resources Business Partnering","Human Resources Consulting",
-  "Human Resources Information Systems","Human Resources Management","Human Resources Management Operations",
-  "Human Resources Operations","Human Resources Policies","Human Resources Software","Human Resources Strategy",
-  "Human Resources Support","Information Management","Inventory Management","Knowledge Management",
-  "Legal Advice","Legal Affairs","Legal Analysis","Legal Compliance","Legal Document Preparation",
-  "Legal Framework","Legal Operations","Legal Research","Legal Writing","Logistics","Logistics Management",
-  "Logistics Planning","Office Administration","Office Management","Operational Management",
-  "Operations Management","Payroll","Payroll Administration","Payroll Management","Performance Management",
-  "Personnel Administration","Personnel Management","Policy Analysis","Policy Development",
-  "Policy Implementation","Policy Research","Procurement","Procurement Contracts","Project Management",
-  "Project Management Body of Knowledge","Project Management Methodologies","Project Management Office",
-  "Project Management Support","Project Management Tools","Public Administration","Public Procurement",
-  "Quality Management","Recruitment","Recruitment Planning","Recruitment Strategies","Reporting",
-  "Risk Management","Security","Security Management","Stakeholder Management","Strategic Communications",
-  "Strategic Human Resource Planning","Strategic Procurement","Supply Chain Management","Talent Acquisition",
-  "Talent Development","Talent Management","Team Leadership","Team Management","Training",
-  "Training & Development","Training Coordination","Travel Management","Vendor Management",
-  "Workforce Management","HR Operations","HR Policies","HR Information Systems","Talent Acquisition",
-  "HR Information Systems","Clerical Skills","Transportation","Logistics Management","Document Management",
-  "Inventory Management","Data Analysis","Office Administration","General Administration",
-  "Travel Management","Communication","Information Management","Security","Security Management",
-  "Legal Compliance","Contract Administration","Financial Management","Budget Management",
-  "Project Management Support","Stakeholder Management","Knowledge Management","Capacity Building"
-].filter((v,i,a)=>a.indexOf(v)===i).sort();
+/* ---- FILE UPLOAD ---- */
+const uploadZone = document.getElementById('upload-zone');
+uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+uploadZone.addEventListener('drop', e => {
+  e.preventDefault(); uploadZone.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file) processFile(file);
+});
 
-let selectedSkills = [];
-let filteredSkills = [];
-
-function filterSkills() {
-  const q = document.getElementById('skill-search').value.toLowerCase().trim();
-  const dd = document.getElementById('skill-dropdown');
-  if (!q) { dd.style.display = 'none'; return; }
-  filteredSkills = APPROVED_SKILLS.filter(s => s.toLowerCase().includes(q) && !selectedSkills.includes(s)).slice(0, 30);
-  if (filteredSkills.length === 0) { dd.innerHTML = '<div class="skill-option" style="color:#7a8ba0;">No matching skills found</div>'; }
-  else { dd.innerHTML = filteredSkills.map(s => `<div class="skill-option" onclick="addSkill('${s.replace(/'/g,"\\'")}')"> ${s}</div>`).join(''); }
-  dd.style.display = 'block';
+async function handleFileUpload(input) {
+  const file = input.files[0];
+  if (file) await processFile(file);
 }
 
-function addSkill(skill) {
-  if (selectedSkills.length >= 9) { alert('Maximum 9 skills allowed per TOR.'); return; }
-  if (!selectedSkills.includes(skill)) {
-    selectedSkills.push(skill);
-    renderSkills();
-    document.getElementById('skill-search').value = '';
-    document.getElementById('skill-dropdown').style.display = 'none';
-    saveDraft();
+async function processFile(file) {
+  uploadZone.innerHTML = `<div class="spinner" style="margin:0 auto 10px;"></div><div style="font-size:13px;color:#5a6a7e;">Reading ${file.name}...</div>`;
+  try {
+    let text = '';
+    if (file.name.endsWith('.docx')) {
+      const arrayBuffer = await file.arrayBuffer();
+      const result = await mammoth.extractRawText({ arrayBuffer });
+      text = result.value;
+    } else {
+      text = await file.text();
+    }
+    parseAndPopulateTOR(text, file.name);
+    uploadZone.className = 'upload-zone upload-success';
+    uploadZone.innerHTML = `<div style="font-size:22px;margin-bottom:6px;">✓</div><div class="upload-zone-title">${file.name} loaded</div><div class="upload-zone-sub" style="cursor:pointer;" onclick="document.getElementById('file-input').click()">Upload a different file</div>`;
+  } catch (err) {
+    uploadZone.innerHTML = `<div class="upload-zone-icon">⚠</div><div class="upload-zone-title" style="color:#c0392b;">Could not read file</div><div class="upload-zone-sub">${err.message}. Try saving as .txt or pasting content below.</div>`;
   }
 }
 
-function removeSkill(skill) {
-  selectedSkills = selectedSkills.filter(s => s !== skill);
-  renderSkills();
+function parseAndPopulateTOR(text, filename) {
+  const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+
+  // Extract title from filename or first meaningful line
+  let title = filename.replace(/\.(docx?|txt)$/i, '').replace(/[_-]+/g, ' ').trim();
+
+  // Try to find position title in document
+  const titleMatch = text.match(/Position\s+Title[:\s]+(.+)/i);
+  if (titleMatch) title = titleMatch[1].trim();
+
+  // Extract job highlight
+  let highlight = '';
+  const hlIdx = text.search(/job\s+highlight/i);
+  if (hlIdx !== -1) {
+    const after = text.slice(hlIdx + 13).trim();
+    const end = after.search(/role\s+purpose|functions|qualifications/i);
+    highlight = (end > 0 ? after.slice(0, end) : after.slice(0, 300)).trim();
+  }
+
+  // Extract role purpose
+  let purpose = '';
+  const rpIdx = text.search(/role\s+purpose/i);
+  if (rpIdx !== -1) {
+    const after = text.slice(rpIdx + 12).trim();
+    const end = after.search(/functions\s*\/|key\s+results|qualifications/i);
+    purpose = (end > 0 ? after.slice(0, end) : after.slice(0, 600)).trim();
+  }
+
+  // Extract functions
+  let functions = '';
+  const fnIdx = text.search(/functions\s*\/?\s*key\s+results|key\s+results\s+expected/i);
+  if (fnIdx !== -1) {
+    const after = text.slice(fnIdx).replace(/functions\s*\/?\s*key\s+results\s*expected\s*/i, '').trim();
+    const end = after.search(/\bskills\b|\bqualifications\b|\beducation\b/i);
+    functions = (end > 0 ? after.slice(0, end) : after.slice(0, 3000)).trim();
+  } else {
+    functions = text.slice(0, 3000);
+  }
+
+  // Extract qualifications
+  let eduReq = '', expReq = '';
+  const eduIdx = text.search(/\beducation\b/i);
+  if (eduIdx !== -1) {
+    const after = text.slice(eduIdx + 9);
+    const end = after.search(/\bexperience\b/i);
+    eduReq = (end > 0 ? after.slice(0, end) : after.slice(0, 400)).replace(/required[:\s]*/i,'').trim();
+  }
+  const expIdx = text.search(/\bexperience\b/i);
+  if (expIdx !== -1) {
+    const after = text.slice(expIdx + 10);
+    const end = after.search(/\blanguage\b|\bskills\b|\bsignature\b/i);
+    expReq = (end > 0 ? after.slice(0, end) : after.slice(0, 400)).replace(/required[:\s]*/i,'').trim();
+  }
+
+  if (!currentTORId) {
+    const id = 'tor_' + Date.now();
+    tors[id] = { id, createdAt: new Date().toISOString() };
+    currentTORId = id;
+  }
+  document.getElementById('pos-title').value = title;
+  document.getElementById('job-highlight').value = highlight;
+  document.getElementById('role-purpose').value = purpose;
+  document.getElementById('functions').value = functions;
+  document.getElementById('edu-required').value = eduReq;
+  document.getElementById('exp-required').value = expReq;
   saveDraft();
 }
 
-function renderSkills() {
-  const container = document.getElementById('selected-skills');
-  document.getElementById('skill-count').textContent = selectedSkills.length;
-  container.innerHTML = selectedSkills.map(s =>
-    `<div class="skill-chip">${s}<button onclick="removeSkill('${s.replace(/'/g,"\\'")}')">✕</button></div>`
-  ).join('');
+/* ---- SKILLS ---- */
+function getSkillsFromTextarea() {
+  const raw = document.getElementById('skills-raw')?.value || '';
+  return raw.split(/[\n,]/).map(s => s.trim()).filter(Boolean).slice(0, 9);
 }
 
-document.addEventListener('click', e => {
-  if (!e.target.closest('#skill-search') && !e.target.closest('#skill-dropdown')) {
-    document.getElementById('skill-dropdown').style.display = 'none';
-  }
-});
-
+/* ---- TABS ---- */
 function switchTab(tab) {
-  document.querySelectorAll('.tab').forEach((t,i) => {
-    const tabs = ['context','functions','skills','qualifications','languages'];
-    t.classList.toggle('active', tabs[i] === tab);
-  });
+  const tabs = ['upload','skills','qualifications','languages'];
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', tabs[i] === tab));
   document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
   document.getElementById('tab-' + tab).classList.add('active');
 }
 
-function setMode(mode) {
-  currentMode = mode;
-  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('mode-' + mode).classList.add('active');
-  const descriptions = {
-    classify: 'Classify this TOR to determine its ICS level with justification',
-    suggest: 'Suggest language improvements to better align the TOR to its stated or classified level',
-    align: 'Rewrite/suggest edits to align the TOR to the target ICS level selected above'
-  };
-  document.getElementById('mode-description').textContent = descriptions[mode];
-  document.getElementById('analysis-result').style.display = 'none';
+/* ---- LANGUAGE TABLE ---- */
+function renderLangTable(langs) {
+  document.getElementById('lang-rows').innerHTML = langs.map((l, i) => `
+    <tr>
+      <td><input type="text" value="${escHtml(l.lang)}" style="width:100%;border:none;background:transparent;font-size:13px;font-family:inherit;" oninput="saveDraft()"></td>
+      <td><select style="width:100%;border:none;background:transparent;font-size:13px;font-family:inherit;" onchange="saveDraft()">
+        ${['Fluent','Advanced','Intermediate','Basic'].map(p=>`<option${p===l.prof?' selected':''}>${p}</option>`).join('')}
+      </select></td>
+      <td><select style="width:100%;border:none;background:transparent;font-size:13px;font-family:inherit;" onchange="saveDraft()">
+        ${['Required','Desired'].map(p=>`<option${p===l.req?' selected':''}>${p}</option>`).join('')}
+      </select></td>
+      <td>${i===0?'':`<button onclick="removeLangRow(this)" style="background:none;border:none;cursor:pointer;color:#c0392b;font-size:14px;">✕</button>`}</td>
+    </tr>`).join('');
+}
+function addLangRow() {
+  const tbody = document.getElementById('lang-rows');
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td><input type="text" placeholder="Language" style="width:100%;border:none;background:transparent;font-size:13px;font-family:inherit;" oninput="saveDraft()"></td>
+    <td><select style="width:100%;border:none;background:transparent;font-size:13px;font-family:inherit;" onchange="saveDraft()"><option>Fluent</option><option>Advanced</option><option>Intermediate</option><option>Basic</option></select></td>
+    <td><select style="width:100%;border:none;background:transparent;font-size:13px;font-family:inherit;" onchange="saveDraft()"><option>Required</option><option>Desired</option></select></td>
+    <td><button onclick="removeLangRow(this)" style="background:none;border:none;cursor:pointer;color:#c0392b;font-size:14px;">✕</button></td>`;
+  tbody.appendChild(tr);
+}
+function removeLangRow(btn) { btn.closest('tr').remove(); saveDraft(); }
+function getLangTableData() {
+  return [...document.querySelectorAll('#lang-rows tr')].map(row => ({
+    lang: row.querySelector('td:nth-child(1) input')?.value || '',
+    prof: row.querySelector('td:nth-child(2) select')?.value || '',
+    req: row.querySelector('td:nth-child(3) select')?.value || ''
+  }));
 }
 
+/* ---- TOR MANAGEMENT ---- */
 function newTOR() {
   const id = 'tor_' + Date.now();
   tors[id] = {
-    id, title: 'Untitled TOR', area: '', unit: '', station: '', targetICS: '',
-    jobHighlight: '', rolePurpose: '', jobContext: '', functions: '',
+    id, title: 'Untitled TOR', area: '', targetICS: '',
+    jobHighlight: '', rolePurpose: '', functions: '',
     skills: [], eduRequired: '', eduDesired: '', expRequired: '', expDesired: '',
-    languages: [{ lang: 'English', prof: 'Fluent', req: 'Required' }, { lang: 'Any national language of the duty station', prof: 'Fluent', req: 'Required' }],
+    languages: [
+      { lang: 'English', prof: 'Fluent', req: 'Required' },
+      { lang: 'Any national language of the duty station', prof: 'Fluent', req: 'Required' }
+    ],
     createdAt: new Date().toISOString(), classifiedICS: null
   };
   saveTORs();
@@ -510,42 +472,47 @@ function loadTOR(id) {
   document.getElementById('welcome-state').style.display = 'none';
   document.getElementById('editor-state').style.display = 'block';
   document.getElementById('pos-title').value = tor.title || '';
-  document.getElementById('pos-area').value = tor.area || '';
-  document.getElementById('pos-unit').value = tor.unit || '';
-  document.getElementById('pos-station').value = tor.station || '';
   document.getElementById('pos-target-ics').value = tor.targetICS || '';
   document.getElementById('job-highlight').value = tor.jobHighlight || '';
   document.getElementById('role-purpose').value = tor.rolePurpose || '';
-  document.getElementById('job-context').value = tor.jobContext || '';
   document.getElementById('functions').value = tor.functions || '';
   document.getElementById('edu-required').value = tor.eduRequired || '';
   document.getElementById('edu-desired').value = tor.eduDesired || '';
   document.getElementById('exp-required').value = tor.expRequired || '';
   document.getElementById('exp-desired').value = tor.expDesired || '';
-  selectedSkills = [...(tor.skills || [])];
-  renderSkills();
-  renderLangTable(tor.languages || []);
+  const skillsEl = document.getElementById('skills-raw');
+  if (skillsEl) skillsEl.value = (tor.skills || []).join('\n');
+  renderLangTable(tor.languages || [{ lang: 'English', prof: 'Fluent', req: 'Required' }]);
+  updateAreaTag(tor.area);
   document.getElementById('analysis-result').style.display = 'none';
-  setMode('classify');
+  document.getElementById('analysis-result').innerHTML = '';
   renderSidebar();
-  switchTab('context');
+  switchTab('upload');
   document.querySelectorAll('.tor-item').forEach(el => el.classList.toggle('active', el.dataset.id === id));
+  // Reset upload zone
+  const uz = document.getElementById('upload-zone');
+  uz.className = 'upload-zone';
+  uz.innerHTML = `<div class="upload-zone-icon">📄</div><div class="upload-zone-title">Upload TOR document</div><div class="upload-zone-sub">Drag &amp; drop a .docx or .txt file, or click to browse</div>`;
+}
+
+function updateAreaTag(area) {
+  const tag = document.getElementById('area-tag-display');
+  if (area) { tag.textContent = area; tag.style.display = 'inline-block'; }
+  else { tag.style.display = 'none'; }
 }
 
 function saveDraft() {
   if (!currentTORId) return;
   const title = document.getElementById('pos-title').value.trim() || 'Untitled TOR';
+  const area = tors[currentTORId]?.area || '';
   tors[currentTORId] = {
     ...tors[currentTORId],
-    title, area: document.getElementById('pos-area').value,
-    unit: document.getElementById('pos-unit').value,
-    station: document.getElementById('pos-station').value,
+    title, area,
     targetICS: document.getElementById('pos-target-ics').value,
     jobHighlight: document.getElementById('job-highlight').value,
     rolePurpose: document.getElementById('role-purpose').value,
-    jobContext: document.getElementById('job-context').value,
     functions: document.getElementById('functions').value,
-    skills: [...selectedSkills],
+    skills: getSkillsFromTextarea(),
     eduRequired: document.getElementById('edu-required').value,
     eduDesired: document.getElementById('edu-desired').value,
     expRequired: document.getElementById('exp-required').value,
@@ -556,313 +523,269 @@ function saveDraft() {
   renderSidebar();
 }
 
-function getLangTableData() {
-  const rows = document.querySelectorAll('#lang-rows tr');
-  return [...rows].map(row => {
-    const cells = row.querySelectorAll('td');
-    return {
-      lang: cells[0].querySelector('input')?.value || '',
-      prof: cells[1].querySelector('select')?.value || '',
-      req: cells[2].querySelector('select')?.value || ''
-    };
-  });
-}
-
-function renderLangTable(langs) {
-  const tbody = document.getElementById('lang-rows');
-  tbody.innerHTML = langs.map((l, i) => `
-    <tr>
-      <td><input type="text" value="${l.lang}" style="width:100%;border:none;background:transparent;font-size:13px;font-family:inherit;"></td>
-      <td><select style="width:100%;border:none;background:transparent;font-size:13px;font-family:inherit;">
-        ${['Fluent','Advanced','Intermediate','Basic'].map(p=>`<option${p===l.prof?' selected':''}>${p}</option>`).join('')}
-      </select></td>
-      <td><select style="width:100%;border:none;background:transparent;font-size:13px;font-family:inherit;">
-        ${['Required','Desired'].map(p=>`<option${p===l.req?' selected':''}>${p}</option>`).join('')}
-      </select></td>
-      <td>${i===0?'':'<button onclick="removeLangRow(this)" style="background:none;border:none;cursor:pointer;color:#c0392b;font-size:14px;">✕</button>'}</td>
-    </tr>`).join('');
-}
-
-function addLangRow() {
-  const tbody = document.getElementById('lang-rows');
-  const tr = document.createElement('tr');
-  tr.innerHTML = `
-    <td><input type="text" placeholder="Language" style="width:100%;border:none;background:transparent;font-size:13px;font-family:inherit;"></td>
-    <td><select style="width:100%;border:none;background:transparent;font-size:13px;font-family:inherit;"><option>Fluent</option><option>Advanced</option><option>Intermediate</option><option>Basic</option></select></td>
-    <td><select style="width:100%;border:none;background:transparent;font-size:13px;font-family:inherit;"><option>Required</option><option>Desired</option></select></td>
-    <td><button onclick="removeLangRow(this)" style="background:none;border:none;cursor:pointer;color:#c0392b;font-size:14px;">✕</button></td>`;
-  tbody.appendChild(tr);
-}
-
-function removeLangRow(btn) { btn.closest('tr').remove(); }
-
-function renderSidebar() {
-  const list = document.getElementById('tor-list');
-  const torArr = Object.values(tors).sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
-  if (torArr.length === 0) {
-    list.innerHTML = '<div class="empty">No TORs saved yet.<br>Create your first above.</div>';
-    return;
-  }
-  list.innerHTML = torArr.map(t => {
-    const ics = t.classifiedICS;
-    const isSupport = ics && parseInt(ics) <= 7;
-    const badgeClass = !ics ? 'ics-pending' : (isSupport ? 'ics-support' : 'ics-professional');
-    const badgeText = ics ? `ICS ${ics}` : 'pending';
-    return `<div class="tor-item${currentTORId===t.id?' active':''}" data-id="${t.id}" onclick="loadTOR('${t.id}')">
-      <div class="tor-item-title">${t.title}</div>
-      <div class="tor-item-meta">${t.area||'No area'} <span class="ics-badge ${badgeClass}">${badgeText}</span></div>
-    </div>`;
-  }).join('');
-}
-
 function deleteTOR() {
   if (!currentTORId) return;
-  if (!confirm(`Delete "${tors[currentTORId]?.title}"? This cannot be undone.`)) return;
+  if (!confirm(`Delete "${tors[currentTORId]?.title}"?`)) return;
   delete tors[currentTORId];
   currentTORId = null;
-  saveTORs();
-  renderSidebar();
+  saveTORs(); renderSidebar();
   document.getElementById('editor-state').style.display = 'none';
   document.getElementById('welcome-state').style.display = 'block';
 }
 
-function saveTORs() {
-  try { localStorage.setItem('unops_tors', JSON.stringify(tors)); } catch(e) {}
+function renderSidebar() {
+  const list = document.getElementById('tor-list');
+  const arr = Object.values(tors).sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+  if (!arr.length) { list.innerHTML = '<div class="empty">No TORs saved yet.<br>Create your first above.</div>'; return; }
+  list.innerHTML = arr.map(t => {
+    const ics = t.classifiedICS;
+    const badgeClass = !ics ? 'ics-pending' : (parseInt(ics) <= 7 ? 'ics-support' : 'ics-professional');
+    const badgeText = ics ? `ICS ${ics}` : 'pending';
+    return `<div class="tor-item${currentTORId===t.id?' active':''}" data-id="${t.id}" onclick="loadTOR('${t.id}')">
+      <div class="tor-item-title">${escHtml(t.title)}</div>
+      <div class="tor-item-meta">${escHtml(t.area||'No area')} <span class="ics-badge ${badgeClass}">${badgeText}</span></div>
+    </div>`;
+  }).join('');
 }
 
+function saveTORs() { try { localStorage.setItem('unops_tors_v2', JSON.stringify(tors)); } catch(e) {} }
 function loadTORs() {
-  try { const d = localStorage.getItem('unops_tors'); if (d) tors = JSON.parse(d); } catch(e) {}
+  try { const d = localStorage.getItem('unops_tors_v2'); if (d) tors = JSON.parse(d); } catch(e) {}
   renderSidebar();
 }
 
-function collectTORData() {
+/* ---- ANALYSIS ---- */
+function runAnalysis() {
   saveDraft();
-  return tors[currentTORId];
-}
-
-async function runAnalysis() {
-  const tor = collectTORData();
-  if (!tor.title || tor.title === 'Untitled TOR') {
-    alert('Please add a position title before running analysis.'); return;
-  }
-  if (!tor.functions.trim()) {
-    alert('Please enter the Functions / Key Results Expected before running analysis.'); return;
-  }
+  const tor = tors[currentTORId];
+  if (!tor) return;
+  if (!tor.functions?.trim()) { alert('Please add TOR content (functions/key results) before running analysis.'); return; }
 
   const resultDiv = document.getElementById('analysis-result');
   resultDiv.style.display = 'block';
-  resultDiv.innerHTML = `<div class="loading-state"><div class="spinner"></div><div class="loading-text">Analysing TOR against ICSC classification framework...</div></div>`;
+  resultDiv.innerHTML = `<div class="loading-state"><div class="spinner"></div><div style="font-size:14px;color:#5a6a7e;">Analysing TOR against ICSC classification framework...</div></div>`;
 
-  const targetICS = tor.targetICS ? `The user has set a target ICS level of ICS ${tor.targetICS}.` : 'No target ICS level has been set; classify based on content.';
+  const hasTarget = !!tor.targetICS;
+  const targetNote = hasTarget ? `The user has set a TARGET ICS level of ICS ${tor.targetICS}. Classify the TOR as it currently stands, then suggest specific language improvements to align it to ICS ${tor.targetICS}.` : 'No target ICS level set. Classify the TOR based on its content and simply state which ICS level it is. Do NOT suggest improvements — only classify.';
 
-  const systemPrompt = `You are an expert UNOPS HR classifier with deep knowledge of the ICSC job evaluation methodology and the ICS 1-14 level framework.
+  const systemPrompt = `You are an expert UNOPS HR classifier with deep knowledge of the ICSC job evaluation methodology and the ICS 1–14 level framework.
 
-CLASSIFICATION FRAMEWORK:
-The four factors are:
+CLASSIFICATION FRAMEWORK — four factors:
 1. NATURE OF WORK: Scope, depth, difficulty, knowledge requirements, action verbs used
 2. ENABLING/WORKING ENVIRONMENT: Supervision received, independence, risk management scope  
 3. PARTNERSHIPS: Level and nature of stakeholder contacts, purpose of interactions
 4. RESULTS-IMPACT RADIUS: Range of impact; supervisory/leadership level
 
-ICS LEVEL CHARACTERISTICS:
-- ICS 1-2: Manual/task-oriented. Close supervision. No judgment required. Repetitive labor.
-- ICS 3: Process support. Routine tasks. Some tools and basic office work. Still close supervision.
-- ICS 4: Process/basic transactions. Executing defined processes. Full knowledge of rules but no specialization. No problem-solving.
-- ICS 5: Intricate transactions. Some judgment. Segment of a process. May be generalist or specialized assistant.
-- ICS 6: Specialized process execution. Ensures integrity of an entire admin process. May supervise 1-2 support staff. Deep procedural knowledge.
-- ICS 7: Para-professional leadership. Manages integrated processes. Paraprofessional in defined area. Can improve work as well as do it.
-- ICS 8: Basic analysis (professional category). Gathers/analyzes data. Reports to higher professional. Applies conceptual models. Thought leadership begins.
-- ICS 9: Analyze. Substantive analysis. May modify conclusions/recommendations. Comments on the work of peers.
-- ICS 10: Adapt. Complete mastery. Independently applies policies. Runs portfolios. Can supervise a team.
-- ICS 11: Originate/Innovate. Develops new policies/approaches. At least 30% of work is novel. Authoritative specialist.
-- ICS 12: Integrate/Deliver. Brings together multiple specializations or teams. Senior advisor or large team leader.
-- ICS 13: Lead. Institutional steward. Breaks ground. Large programme accountability.
-- ICS 14: Lead/Elevate. Senior management team. Organizational-level impact.
+ICS LEVEL QUICK REFERENCE:
+- ICS 1–2: Manual/task-oriented. Close supervision. No judgment. Repetitive labor.
+- ICS 3: Process support. Routine tasks. Basic office work. Still supervised.
+- ICS 4: Basic transactions. Executing defined processes. Full knowledge of rules, no specialization.
+- ICS 5: Intricate transactions. Some judgment. Segment of a process. Specialist or generalist assistant.
+- ICS 6: Specialized process execution. Ensures integrity of an entire admin process. May supervise 1–2 staff.
+- ICS 7: Para-professional leadership. Manages integrated processes. Can improve the work, not just do it.
+- ICS 8: Basic analysis (start of professional category). Thought leadership begins. Applies conceptual models.
+- ICS 9: Substantive analysis. May modify conclusions/recommendations of others.
+- ICS 10: Complete mastery. Independently applies policies. Runs portfolios/programmes. May lead a team.
+- ICS 11: Originates/Innovates. Develops new policies. At least 30% novel work. Authoritative specialist.
+- ICS 12: Integrate/Deliver. Brings together multiple specialisations or teams.
+- ICS 13–14: Institutional stewards. Large programme leadership. Org-wide impact.
 
-IMPORTANT RULES:
-- Support (ICS 1-7): work is transactional; measured by speed, accuracy, quality
-- Professional (ICS 8-14): work is analytical, evaluative, conceptual, transformative
-- Language matters: "assists", "supports", "prepares", "maintains" = lower levels; "analyzes", "designs", "develops", "originates" = higher
-- Never upgrade a TOR based on volume of work, number of supervisees, years of experience, or outstanding performance
-- TORs must be in third person
+RULES:
+- Support (ICS 1–7): transactional; measured by speed, accuracy, quality
+- Professional (ICS 8–14): analytical, evaluative, conceptual, transformative
+- Language matters: "assists", "supports", "prepares", "maintains" → lower; "analyses", "designs", "develops", "originates" → higher
+- Never upgrade for volume of work, number of supervisees, years of experience, or performance
+- All TOR language must be in third person
 
-STANDARD TOR LIBRARY (key comparators):
-- HR Assistant ICS 4: Tracks requests, drafts offers, monitors recruitment process, maintains registers and files, addresses queries.
-- HR Senior Assistant ICS 5: Executes intricate transactions, executes a range of admin tasks, monitors transactions, collects/verifies documentation, provides inputs to SOPs.
-- HR Associate ICS 6: Monitors/tracks HR transactions, researches precedents, provides professional advice to staff, coordinates workflow, contributes to SOPs.
-- HR Senior Associate ICS 7: Provides guidance on systems/processes, supports onboarding, advises on recruitment procedures, manages integrated HR processes, supports payroll verification.
-- HR Officer ICS 8: Conducts analysis, provides substantive advice, applies conceptual models, contributes to policy discussions.
-- HR Senior Officer ICS 9: Analyzes HR service lines, makes substantive contributions, may modify recommendations.
-- HR Specialist ICS 10: Leads HR implementation, designs HR projects, provides strategic guidance, runs portfolio, oversees team.
-- Administration Clerk ICS 3: Routine admin and clerical, filing, reception, logistics assistance, basic data entry.
+SKILLS VALIDATION: The user will provide a list of skills they have written for the TOR. You must check each one against the approved UNOPS Talent+Skills list below. Any skill that does not appear on this list (exact match, case-insensitive) must be flagged in the "invalidSkills" array with a suggested replacement from the list where possible.
+
+APPROVED SKILLS LIST (partial — key UNOPS-relevant skills):
+Administration, Administrative Management, Audit, Benefit Administration, Benefits Administration, Budget Analysis, Budget Management, Budget Monitoring, Budgeting, Business Administration, Capacity Building, Capacity Development, Change Management, Clerical Skills, Communication, Communication and Collaboration Tools, Communications Management, Communications Planning, Compliance, Compliance Management, Contract Administration, Contract Analysis, Contract Drafting, Contract Management, Contract Negotiation, Contract Review, Contracts, Data Analysis, Data Collection, Data Management, Data Reporting, Data Visualization, Document Management, Emergency Management, Event Management, Finance, Finance Accounting, Financial Management, Financial Reporting, General Administration, Government Procurement, Human Resources, Human Resources Analytics, Human Resources Business Partnering, Human Resources Consulting, Human Resources Information Systems, Human Resources Management, Human Resources Management Operations, Human Resources Operations, Human Resources Policies, Human Resources Software, Human Resources Strategy, Human Resources Support, HR Operations, HR Policies, HR Information Systems, Information Management, Inventory Management, Knowledge Management, Legal Advice, Legal Affairs, Legal Analysis, Legal Compliance, Legal Document Preparation, Legal Framework, Legal Operations, Legal Research, Legal Writing, Logistics, Logistics Management, Logistics Planning, Office Administration, Office Management, Operational Management, Operations Management, Payroll, Payroll Administration, Payroll Management, Performance Management, Personnel Administration, Personnel Management, Policy Analysis, Policy Development, Policy Implementation, Policy Research, Procurement, Procurement Contracts, Project Management, Project Management Body of Knowledge, Project Management Methodologies, Project Management Office, Project Management Support, Project Management Tools, Public Administration, Public Procurement, Quality Management, Recruitment, Recruitment Planning, Recruitment Strategies, Reporting, Risk Management, Security, Security Management, Stakeholder Management, Strategic Communications, Strategic Human Resource Planning, Strategic Procurement, Supply Chain Management, Talent Acquisition, Talent Development, Talent Management, Team Leadership, Team Management, Training, Training & Development, Training Coordination, Travel Management, Vendor Management, Workforce Management, Transportation, Inventory Management, Information Management
+- HR Assistant ICS 4: Tracks requests, drafts offers, monitors recruitment, maintains files, addresses queries.
+- HR Senior Assistant ICS 5: Executes intricate transactions, monitors transactions, collects/verifies documentation, provides inputs to SOPs.
+- HR Associate ICS 6: Monitors/tracks HR transactions, researches precedents, provides professional advice, coordinates workflow, contributes to SOPs.
+- HR Senior Associate ICS 7: Provides guidance on systems/processes, advises on recruitment, manages integrated HR processes, supports payroll verification.
+- HR Officer ICS 8: Conducts analysis, provides substantive advice, applies conceptual models, contributes to policy.
+- HR Senior Officer ICS 9: Analyses HR service lines, makes substantive contributions, may modify recommendations.
+- HR Specialist ICS 10: Leads HR implementation, designs HR projects, strategic guidance, runs portfolio, oversees team.
+- Administration Clerk ICS 3: Routine admin, filing, reception, logistics assistance, basic data entry.
 - Administration Assistant ICS 4: Ensures maintenance, coordinates transport, implements systems, manages inventory.
 - Administration Associate ICS 6: Coordinates work areas, monitors performance, oversees logistics, compiles data.
+- Finance Assistant ICS 4: Processes transactions, maintains records, verifies documentation.
+- Finance Senior Officer ICS 9: Analyses financial data, makes recommendations, substantive contributions.
+- Procurement Associate ICS 6: Ensures process integrity, coordinates procurement workflow, advises on rules.
+- Project Manager ICS 10: Manages projects, runs portfolio, independently applies PM methodology, supervises team.
 
-Respond in valid JSON only (no markdown). Structure your response as:
+FUNCTION AREA IDENTIFICATION: Based on the TOR content, identify the most appropriate functional area from: Administration, Communications, Construction & Engineering, Data Analysis, Finance, Human Resources, ICT, Legal, Partnerships, Procurement, Project Management, Project Manager, Security.
+
+Respond in valid JSON only (no markdown or code fences). Schema:
 {
-  "classifiedLevel": number (e.g. 7),
-  "confidenceNote": "string - brief note on confidence",
-  "workCategory": "Support" or "Professional",
+  "classifiedLevel": number,
+  "functionArea": "string — identified function area",
+  "confidenceNote": "string",
+  "workCategory": "Support" | "Professional",
+  "overallJustification": "string — clear explanation of the ICS level",
   "factors": {
-    "natureOfWork": { "verdict": "aligned" | "above" | "below", "analysis": "string" },
-    "workingEnvironment": { "verdict": "aligned" | "above" | "below", "analysis": "string" },
-    "partnerships": { "verdict": "aligned" | "above" | "below", "analysis": "string" },
-    "resultsImpact": { "verdict": "aligned" | "above" | "below", "analysis": "string" }
+    "natureOfWork": { "verdict": "aligned"|"above"|"below", "analysis": "string" },
+    "workingEnvironment": { "verdict": "aligned"|"above"|"below", "analysis": "string" },
+    "partnerships": { "verdict": "aligned"|"above"|"below", "analysis": "string" },
+    "resultsImpact": { "verdict": "aligned"|"above"|"below", "analysis": "string" }
   },
-  "overallJustification": "string",
-  "keyVerbs": ["list of action verbs found in TOR"],
-  "redFlags": ["any language that seems mis-levelled or inconsistent"],
-  "suggestions": [
-    { "type": "modify" | "remove", "original": "original phrase", "revised": "revised phrase or null", "reason": "why" }
+  "keyVerbs": ["array of action verbs found"],
+  "redFlags": ["language inconsistencies, if any"],
+  "invalidSkills": [
+    { "skill": "string — skill as entered", "reason": "not on approved list", "suggestedReplacement": "string or null" }
   ],
-  "alignedTORLanguage": {
-    "rolePurpose": "revised role purpose if in suggest/align mode",
-    "functions": "revised functions text if in suggest/align mode"
-  }
+  "hasSuggestions": true | false,
+  "targetLevel": number | null,
+  "suggestions": [
+    { "type": "modify"|"remove", "original": "string", "revised": "string or null", "reason": "string" }
+  ],
+  "revisedRolePurpose": "string or null — only if suggestions provided",
+  "revisedFunctions": "string or null — full revised functions text, only if suggestions provided"
 }`;
 
-  const userMsg = currentMode === 'classify'
-    ? `Classify this TOR and explain the ICS level based on the four factors.
-${targetICS}
+  const userMsg = `${targetNote}
 
 POSITION TITLE: ${tor.title}
-FUNCTION AREA: ${tor.area}
-JOB HIGHLIGHT: ${tor.jobHighlight}
-ROLE PURPOSE: ${tor.rolePurpose}
+ROLE PURPOSE: ${tor.rolePurpose || '(not provided)'}
 FUNCTIONS / KEY RESULTS EXPECTED:
 ${tor.functions}
-SKILLS: ${tor.skills.join(', ')}
-QUALIFICATIONS: ${tor.eduRequired}
-EXPERIENCE: ${tor.expRequired}
+SKILLS: ${(tor.skills||[]).join(', ') || '(not specified)'}
+QUALIFICATIONS: ${tor.eduRequired || '(not provided)'}
+EXPERIENCE: ${tor.expRequired || '(not provided)'}
 
-MODE: classify
-Provide classification with detailed factor-by-factor analysis.`
-    : currentMode === 'suggest'
-    ? `Review this TOR and suggest specific language improvements (particularly action verbs) to better align it to its ICS level. Do NOT add new tasks — only modify or remove existing ones.
-${targetICS}
+Identify the function area from the content. ${hasTarget ? `Classify, then provide specific language improvement suggestions (verb changes, scope adjustments) to align the TOR to ICS ${tor.targetICS}. Do NOT add new tasks — only modify or remove existing ones. If a task is too high for ICS ${tor.targetICS}, suggest removal or a reframed version. Also provide revised role purpose and revised full functions text at the target level.` : 'Only classify. No suggestions needed.'}`;
 
-POSITION TITLE: ${tor.title}
-FUNCTION AREA: ${tor.area}
-ROLE PURPOSE: ${tor.rolePurpose}
-FUNCTIONS / KEY RESULTS EXPECTED:
-${tor.functions}
-SKILLS: ${tor.skills.join(', ')}
-
-MODE: suggest
-Provide a classification first, then specific language modification suggestions.`
-    : `This TOR should be aligned to ICS ${tor.targetICS || '?'}. Suggest specific language changes (action verbs and scope language) to each task to achieve that level. Do not add new tasks. If a task is too high for the target level, suggest removal or how to reframe it.
-
-POSITION TITLE: ${tor.title}
-FUNCTION AREA: ${tor.area}
-ROLE PURPOSE: ${tor.rolePurpose}
-FUNCTIONS / KEY RESULTS EXPECTED:
-${tor.functions}
-SKILLS: ${tor.skills.join(', ')}
-CURRENT QUALIFICATIONS: ${tor.eduRequired}
-
-TARGET ICS LEVEL: ICS ${tor.targetICS}
-MODE: align
-Align role purpose language, functions language, and qualifications to the target level.`;
-
-  try {
-    const response = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 2000,
-        system: systemPrompt,
-        messages: [{ role: 'user', content: userMsg }]
-      })
-    });
-
-    const data = await response.json();
-    const rawText = data.content?.map(c => c.text || '').join('');
-    const cleaned = rawText.replace(/```json|```/g, '').trim();
-    const result = JSON.parse(cleaned);
-
-    if (result.classifiedLevel && tors[currentTORId]) {
+  // Use the Anthropic API — claude.ai artifacts have access via the proxy
+  fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      "x-api-key": "proxy",
+      "anthropic-version": "2023-06-01",
+      "anthropic-dangerous-direct-browser-access": "true"
+    },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 2500,
+      system: systemPrompt,
+      messages: [{ role: "user", content: userMsg }]
+    })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+    const raw = (data.content || []).map(c => c.text || "").join("");
+    const jsonMatch = raw.replace(/```json|```/g, "").trim().match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error("No JSON in response: " + raw.slice(0, 200));
+    const result = JSON.parse(jsonMatch[0]);
+    if (result.classifiedLevel && currentTORId && tors[currentTORId]) {
       tors[currentTORId].classifiedICS = result.classifiedLevel;
-      saveTORs();
-      renderSidebar();
+      if (result.functionArea) { tors[currentTORId].area = result.functionArea; updateAreaTag(result.functionArea); }
+      saveTORs(); renderSidebar();
     }
-
     renderResult(result, tor);
-  } catch (err) {
-    resultDiv.innerHTML = `<div class="callout warning"><span class="callout-icon">⚠</span><span class="callout-text">Analysis failed. Please check your connection and try again.<br><small style="color:#7a8ba0;">${err.message}</small></span></div>`;
-  }
+  })
+  .catch(err => {
+    document.getElementById('analysis-result').innerHTML =
+      `<div class="callout warning"><span class="callout-icon">⚠</span><div class="callout-text"><strong>Analysis failed.</strong><br>${escHtml(err.message)}</div></div>`;
+  });
 }
 
 function renderResult(result, tor) {
   const isSupport = result.classifiedLevel <= 7;
   const catColor = isSupport ? '#1565a3' : '#2e7d32';
   const catBg = isSupport ? '#e3f2f8' : '#e8f5e9';
-
-  const verdictLabels = { aligned: 'Aligned', above: 'Above level', below: 'Below level' };
-  const verdictClasses = { aligned: 'verdict-aligned', above: 'verdict-above', below: 'verdict-below' };
+  const vLabel = { aligned:'Aligned', above:'Above level', below:'Below level' };
+  const vClass = { aligned:'verdict-aligned', above:'verdict-above', below:'verdict-below' };
+  const hasTarget = !!tor.targetICS;
 
   const factorRows = [
     ['Nature of Work', result.factors?.natureOfWork],
     ['Working Environment', result.factors?.workingEnvironment],
     ['Partnerships', result.factors?.partnerships],
     ['Results-Impact Radius', result.factors?.resultsImpact]
-  ].map(([name, f]) => f ? `
+  ].filter(([,f])=>f).map(([name,f]) => `
     <tr>
       <td class="factor-name">${name}</td>
-      <td class="factor-verdict"><span class="verdict-pill ${verdictClasses[f.verdict]}">${verdictLabels[f.verdict]}</span></td>
-      <td style="font-size:13px; color:#2c3e50; line-height:1.6;">${f.analysis}</td>
-    </tr>` : '').join('');
+      <td class="factor-verdict"><span class="verdict-pill ${vClass[f.verdict]}">${vLabel[f.verdict]}</span></td>
+      <td style="font-size:13px;color:#2c3e50;line-height:1.6;">${escHtml(f.analysis)}</td>
+    </tr>`).join('');
 
-  const suggestionsHTML = (result.suggestions || []).map(s => `
-    <div class="suggestion-item ${s.type === 'remove' ? 'remove' : ''}">
-      <strong>Original:</strong> "${s.original}"<br>
-      ${s.type === 'remove' ? '<em style="color:#c0392b;">→ Suggest removal: </em>' : '<strong>Revised:</strong> "' + (s.revised||'') + '"<br>'}
-      <em style="color:#7a8ba0; font-size:12px;">${s.reason}</em>
-    </div>`).join('');
+  const verbsHTML = (result.keyVerbs||[]).length ? `
+    <div style="margin-bottom:16px;">
+      <div style="font-size:12px;font-weight:600;color:#4a5568;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:6px;">Key Action Verbs</div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px;">${result.keyVerbs.map(v=>`<span style="background:#f0f5ff;color:#1a3d70;border:1px solid #c5d6ee;border-radius:4px;padding:3px 9px;font-size:12px;font-weight:500;">${escHtml(v)}</span>`).join('')}</div>
+    </div>` : '';
 
-  const redFlagsHTML = (result.redFlags || []).length > 0 ? `
+  const redFlagsHTML = (result.redFlags||[]).length ? `
+    <div class="callout warning">
+      <span class="callout-icon">⚠</span>
+      <div class="callout-text"><strong>Language flags:</strong><br>${result.redFlags.map(f=>`• ${escHtml(f)}`).join('<br>')}</div>
+    </div>` : '';
+
+  const suggestionsHTML = hasTarget && (result.suggestions||[]).length ? `
+    <div class="suggestion-block" style="margin-top:4px;">
+      <div class="suggestion-title">Language suggestions to align to ICS ${tor.targetICS}</div>
+      ${result.suggestions.map(s => `
+        <div class="suggestion-item${s.type==='remove'?' remove':''}">
+          <strong>Original:</strong> "${escHtml(s.original)}"<br>
+          ${s.type==='remove'
+            ? `<em style="color:#c0392b;">Remove — ${escHtml(s.reason)}</em>`
+            : `<strong>Revised:</strong> "${escHtml(s.revised||'')}"<br><em style="color:#7a8ba0;font-size:12px;">${escHtml(s.reason)}</em>`}
+        </div>`).join('')}
+    </div>` : '';
+
+  const revisedPurposeHTML = hasTarget && result.revisedRolePurpose ? `
+    <div class="suggestion-block">
+      <div class="suggestion-title">Revised Role Purpose — ICS ${tor.targetICS}</div>
+      <div style="font-size:13px;line-height:1.7;color:#2c3e50;white-space:pre-wrap;">${escHtml(result.revisedRolePurpose)}</div>
+    </div>` : '';
+
+  const revisedFunctionsHTML = hasTarget && result.revisedFunctions ? `
+    <div class="suggestion-block">
+      <div class="suggestion-title">Revised Functions — ICS ${tor.targetICS}</div>
+      <div style="font-size:13px;line-height:1.7;color:#2c3e50;white-space:pre-wrap;">${escHtml(result.revisedFunctions)}</div>
+    </div>` : '';
+
+  const classifyOnlyNote = !hasTarget ? `
+    <div class="callout info" style="margin-top:4px;">
+      <span class="callout-icon">ℹ</span>
+      <span class="callout-text">No target ICS level set. To receive language improvement suggestions, select a target ICS level in the Position Information panel above and run the analysis again.</span>
+    </div>` : '';
+
+  const invalidSkillsHTML = (result.invalidSkills||[]).length ? `
     <div class="callout warning">
       <span class="callout-icon">⚠</span>
       <div class="callout-text">
-        <strong>Language flags:</strong><br>
-        ${result.redFlags.map(f => `• ${f}`).join('<br>')}
+        <strong>Skills not on the approved Talent+Skills list:</strong><br>
+        ${result.invalidSkills.map(s =>
+          `• <strong>${escHtml(s.skill)}</strong>${s.suggestedReplacement ? ` → suggested replacement: <em>${escHtml(s.suggestedReplacement)}</em>` : ' — no direct equivalent found'}`
+        ).join('<br>')}
       </div>
-    </div>` : '';
-
-  const verbsHTML = (result.keyVerbs || []).length > 0 ?
-    `<div style="margin-bottom:16px;"><div style="font-size:12px; font-weight:600; color:#4a5568; text-transform:uppercase; letter-spacing:0.4px; margin-bottom:6px;">Key Action Verbs Identified</div>
-    <div style="display:flex; flex-wrap:wrap; gap:5px;">${result.keyVerbs.map(v => `<span style="background:#f0f5ff; color:#1a3d70; border:1px solid #c5d6ee; border-radius:4px; padding:3px 9px; font-size:12px; font-weight:500;">${v}</span>`).join('')}</div></div>` : '';
-
-  const alignedFunctionsHTML = currentMode !== 'classify' && result.alignedTORLanguage?.functions ? `
-    <div class="suggestion-block" style="margin-top:16px;">
-      <div class="suggestion-title">Revised Functions / Key Results Expected</div>
-      <div style="white-space: pre-wrap; font-size:13px; line-height:1.7; color:#2c3e50;">${result.alignedTORLanguage.functions}</div>
-    </div>` : '';
-
-  const alignedRolePurposeHTML = currentMode !== 'classify' && result.alignedTORLanguage?.rolePurpose ? `
-    <div class="suggestion-block" style="margin-top:16px;">
-      <div class="suggestion-title">Revised Role Purpose</div>
-      <div style="font-size:13px; line-height:1.7; color:#2c3e50;">${result.alignedTORLanguage.rolePurpose}</div>
     </div>` : '';
 
   document.getElementById('analysis-result').innerHTML = `
     <div class="result-header">
       <div class="ics-level-badge">ICS ${result.classifiedLevel}</div>
       <div>
-        <div class="result-title">${tor.title || 'Untitled TOR'}</div>
-        <div style="display:flex; gap:8px; align-items:center; margin-top:4px;">
-          <span style="background:${catBg}; color:${catColor}; font-size:11px; font-weight:700; padding:2px 9px; border-radius:4px; text-transform:uppercase; letter-spacing:0.4px;">${result.workCategory}</span>
-          <span class="result-subtitle">${result.confidenceNote}</span>
+        <div class="result-title">${escHtml(tor.title||'Untitled TOR')}<span style="font-weight:400; color:#7a8ba0; font-size:13px;"> · ${escHtml(result.functionArea||tor.area||'')}</span></div>
+        <div style="display:flex;gap:8px;align-items:center;margin-top:4px;flex-wrap:wrap;">
+          <span style="background:${catBg};color:${catColor};font-size:11px;font-weight:700;padding:2px 9px;border-radius:4px;text-transform:uppercase;letter-spacing:0.4px;">${result.workCategory}</span>
+          ${hasTarget ? `<span style="background:#f3e5f5;color:#6a1b9a;font-size:11px;font-weight:700;padding:2px 9px;border-radius:4px;text-transform:uppercase;letter-spacing:0.4px;">Target: ICS ${tor.targetICS}</span>` : ''}
+          <span style="font-size:13px;color:#5a6a7e;">${escHtml(result.confidenceNote||'')}</span>
         </div>
       </div>
     </div>
 
     <div class="callout success">
       <span class="callout-icon">✓</span>
-      <span class="callout-text">${result.overallJustification}</span>
+      <span class="callout-text">${escHtml(result.overallJustification)}</span>
     </div>
 
     ${redFlagsHTML}
+    ${invalidSkillsHTML}
     ${verbsHTML}
 
     <table class="classification-table">
@@ -870,90 +793,89 @@ function renderResult(result, tor) {
       <tbody>${factorRows}</tbody>
     </table>
 
-    ${currentMode !== 'classify' && suggestionsHTML ? `
-      <div class="suggestion-block">
-        <div class="suggestion-title">${currentMode === 'align' ? `Language Suggestions to Align to ICS ${tor.targetICS}` : 'Language Improvement Suggestions'}</div>
-        ${suggestionsHTML || '<div style="font-size:13px; color:#7a8ba0; font-style:italic;">No specific language changes needed — TOR language is well-aligned.</div>'}
-      </div>` : ''}
-
-    ${alignedRolePurposeHTML}
-    ${alignedFunctionsHTML}
+    ${classifyOnlyNote}
+    ${suggestionsHTML}
+    ${revisedPurposeHTML}
+    ${revisedFunctionsHTML}
   `;
 }
 
+/* ---- EXPORT ---- */
 function exportTOR() {
-  const tor = collectTORData();
-  const langs = tor.languages || [];
-  const langRows = langs.map(l => `${l.lang.padEnd(35)} ${l.prof.padEnd(20)} ${l.req}`).join('\n');
-
+  saveDraft();
+  const tor = tors[currentTORId];
+  if (!tor) return;
+  const langs = (tor.languages||[]).map(l=>`  ${l.lang.padEnd(36)}${l.prof.padEnd(22)}${l.req}`).join('\n');
   const text = `UNOPS TERMS OF REFERENCE
-${'='.repeat(60)}
+${'═'.repeat(62)}
 
 I. POSITION INFORMATION
-Position Title:        ${tor.title}
-ICS Level:             ${tor.classifiedICS ? 'ICS ' + tor.classifiedICS : 'Pending classification'}
-Position Area:         ${tor.area}
-Organizational Unit:   ${tor.unit}
-Duty Station:          ${tor.station}
+Position Title:    ${tor.title}
+ICS Level:         ${tor.classifiedICS ? 'ICS ' + tor.classifiedICS : 'Pending classification'}
+Position Area:     ${tor.area || '(not classified yet)'}
 
-${'='.repeat(60)}
+${'═'.repeat(62)}
 II. ORGANIZATIONAL CONTEXT
 
 Job Highlight:
-${tor.jobHighlight}
+${tor.jobHighlight||''}
 
 Role Purpose:
-${tor.rolePurpose}
+${tor.rolePurpose||''}
 
-${tor.jobContext ? `Job-Specific Context:\n${tor.jobContext}\n` : ''}
-${'='.repeat(60)}
+${'═'.repeat(62)}
 III. FUNCTIONS / KEY RESULTS EXPECTED
 
-${tor.functions}
+${tor.functions||''}
 
-${'='.repeat(60)}
+${'═'.repeat(62)}
 IV. SKILLS
 
-${tor.skills.map(s => '- ' + s).join('\n') || '(none selected)'}
+${(tor.skills||[]).map(s=>`- ${s}`).join('\n')||'(none selected)'}
 
-${'='.repeat(60)}
+${'═'.repeat(62)}
 V. QUALIFICATIONS
 
-Education - Required:
-${tor.eduRequired}
+Education — Required:
+${tor.eduRequired||''}
 
-Education - Desired:
-${tor.eduDesired}
+Education — Desired:
+${tor.eduDesired||''}
 
-Experience - Required:
-${tor.expRequired}
+Experience — Required:
+${tor.expRequired||''}
 
-Experience - Desired:
-${tor.expDesired}
+Experience — Desired:
+${tor.expDesired||''}
 
-${'='.repeat(60)}
+${'═'.repeat(62)}
 VI. LANGUAGE REQUIREMENTS
 
-Language                            Proficiency          Required/Desired
-${'-'.repeat(65)}
-${langRows}
+  ${'Language'.padEnd(36)}${'Proficiency'.padEnd(22)}Required/Desired
+  ${'-'.repeat(60)}
+${langs}
 
-${'='.repeat(60)}
+${'═'.repeat(62)}
 VII. SIGNATURE
 
-Incumbent Name: ___________________________
-Signature: ___________________________   Date: _______________
+Incumbent Name: _________________________________
+Signature: ______________________________   Date: _______________
 
-${'='.repeat(60)}
-Generated by UNOPS TOR Classification Tool | ${new Date().toLocaleDateString()}`;
+${'═'.repeat(62)}
+Generated by UNOPS TOR Classification Tool · ${new Date().toLocaleDateString('en-GB')}`;
 
-  const blob = new Blob([text], { type: 'text/plain' });
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = (tor.title || 'TOR').replace(/[^a-z0-9]/gi, '_') + '_' + (tor.classifiedICS ? 'ICS' + tor.classifiedICS : 'draft') + '.txt';
+  a.download = (tor.title||'TOR').replace(/[^a-z0-9]/gi,'_') + (tor.classifiedICS ? '_ICS'+tor.classifiedICS : '_draft') + '.txt';
   a.click();
   URL.revokeObjectURL(url);
+}
+
+function escHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 loadTORs();
