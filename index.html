@@ -842,43 +842,64 @@ function cleanJSON(raw) {
   if (start === -1 || end === -1) throw new Error('No JSON object found in response.');
   s = s.slice(start, end + 1);
 
-  // Pass 1: try parsing as-is (often works perfectly)
+  // Pass 1: try parsing as-is
   try { return JSON.parse(s); } catch(e0) {}
 
-  // Pass 2: fix trailing commas before ] or }, then try again
+  // Pass 2: fix trailing commas, try again
   const s2 = s.replace(/,(\s*[}\]])/g, '$1');
   try { return JSON.parse(s2); } catch(e1) {}
 
-  // Pass 3: walk character-by-character, fixing unescaped control characters
-  // ONLY inside string values — never touch structural JSON characters
+  // Pass 3: character-by-character repair inside string values only
   function repairJSON(str) {
+    // Valid JSON escape characters after a backslash
+    const validEscapes = new Set(['"', '\\', '/', 'b', 'f', 'n', 'r', 't', 'u']);
     let out = '';
     let inStr = false;
-    let escape = false;
-    for (let i = 0; i < str.length; i++) {
+    let i = 0;
+    while (i < str.length) {
       const ch = str[i];
-      if (escape) {
+
+      if (!inStr) {
+        // Outside a string: pass through as-is
+        if (ch === '"') inStr = true;
         out += ch;
-        escape = false;
+        i++;
         continue;
       }
+
+      // Inside a string
       if (ch === '\\') {
-        escape = true;
-        out += ch;
+        const next = str[i + 1];
+        if (validEscapes.has(next)) {
+          // Valid escape — keep both characters
+          out += ch + next;
+          i += 2;
+          // Handle \uXXXX
+          if (next === 'u') {
+            out += str.slice(i, i + 4);
+            i += 4;
+          }
+        } else {
+          // Invalid escape (e.g. \' or \,) — drop the backslash, keep the character
+          i++;
+        }
         continue;
       }
+
       if (ch === '"') {
-        inStr = !inStr;
+        inStr = false;
         out += ch;
+        i++;
         continue;
       }
-      if (inStr) {
-        // Inside a string: escape any bare control characters
-        if (ch === '\n') { out += '\\n'; continue; }
-        if (ch === '\r') { out += '\\r'; continue; }
-        if (ch === '\t') { out += '\\t'; continue; }
-      }
+
+      // Bare control characters inside strings — escape them
+      if (ch === '\n') { out += '\\n'; i++; continue; }
+      if (ch === '\r') { out += '\\r'; i++; continue; }
+      if (ch === '\t') { out += '\\t'; i++; continue; }
+
       out += ch;
+      i++;
     }
     return out;
   }
