@@ -799,7 +799,11 @@ JSON SCHEMA — respond with exactly this structure:
     return;
   }
 
-  // Call the Anthropic API with the user-provided key
+  // Store context before the async call
+  window._pendingTOR = { ...tor };
+  window._pendingTORId = currentTORId;
+
+  // Call the Anthropic API
   fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
@@ -810,7 +814,8 @@ JSON SCHEMA — respond with exactly this structure:
     },
     body: JSON.stringify({
       model: "claude-opus-4-6",
-      max_tokens: 2500,
+      max_tokens: 3000,
+      system: "You are a JSON-only API. You must respond with a single valid JSON object and absolutely nothing else — no explanation, no markdown, no code fences. Every string value must be on one line. Do not use real newlines inside string values; use the two-character sequence \\n if you need a line break inside a value. Do not use brackets [ or ] inside string values. Keep all string values simple and concise.",
       messages: [{ role: "user", content: prompt }]
     })
   })
@@ -818,8 +823,7 @@ JSON SCHEMA — respond with exactly this structure:
   .then(data => {
     if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
     const raw = (data.content || []).map(c => c.text || "").join("");
-    window._pendingTOR = { ...tor };
-    window._pendingTORId = currentTORId;
+    window._lastRawResponse = raw; // store for debugging
     applyResult(raw);
   })
   .catch(err => {
@@ -906,7 +910,44 @@ function cleanJSON(raw) {
 
   const s3 = repairJSON(s2);
   try { return JSON.parse(s3); } catch(e2) {
-    throw new Error(`JSON parse failed: ${e2.message}`);
+    // Pass 4: also sanitise any unescaped structural chars that snuck inside strings
+    // Replace bare [ and ] inside strings with parentheses as last resort
+    function deepRepair(str) {
+      let out = '';
+      let inStr = false;
+      let i = 0;
+      while (i < str.length) {
+        const ch = str[i];
+        if (!inStr) {
+          if (ch === '"') inStr = true;
+          out += ch; i++; continue;
+        }
+        if (ch === '\\') {
+          const next = str[i+1];
+          const validEscapes = new Set(['"','\\','/','b','f','n','r','t','u']);
+          if (validEscapes.has(next)) {
+            out += ch + next; i += 2;
+            if (next === 'u') { out += str.slice(i, i+4); i += 4; }
+          } else { i++; } // drop bad backslash
+          continue;
+        }
+        if (ch === '"') { inStr = false; out += ch; i++; continue; }
+        if (ch === '\n') { out += '\\n'; i++; continue; }
+        if (ch === '\r') { out += '\\r'; i++; continue; }
+        if (ch === '\t') { out += '\\t'; i++; continue; }
+        // Replace unescaped structural chars inside strings
+        if (ch === '[') { out += '('; i++; continue; }
+        if (ch === ']') { out += ')'; i++; continue; }
+        if (ch === '{') { out += '('; i++; continue; }
+        if (ch === '}') { out += ')'; i++; continue; }
+        out += ch; i++;
+      }
+      return out;
+    }
+    const s4 = deepRepair(s2);
+    try { return JSON.parse(s4); } catch(e3) {
+      throw new Error(`JSON parse failed: ${e2.message}`);
+    }
   }
 }
 
@@ -931,17 +972,19 @@ function applyResult(raw) {
     window._pendingTORId = null;
     renderResult(result, tor);
   } catch(err) {
+    const rawPreview = (window._lastRawResponse || '').slice(0, 300);
     resultDiv.innerHTML = `
       <div class="callout warning">
         <span class="callout-icon">⚠</span>
         <div class="callout-text">
           <strong>Could not read the classification result.</strong><br>
           <span style="color:#7a8ba0;font-size:12px;">${escHtml(err.message)}</span><br><br>
-          This usually happens when the response contained an apostrophe or special character that broke the JSON. Try clicking <strong>Classify &amp; Analyse</strong> again — it should work on the next attempt.<br><br>
+          Please click <strong>Classify &amp; Analyse</strong> again — this usually resolves on retry.<br><br>
           <button class="btn-primary" style="font-size:12px;padding:6px 14px;" onclick="runAnalysis()">↺ Try Again</button>
           &nbsp;
           <button style="font-size:12px;padding:6px 14px;background:#fff;color:#003168;border:1.5px solid #c5d6ee;border-radius:6px;cursor:pointer;font-family:inherit;" onclick="document.getElementById('parse-input').style.display='block'">Paste raw response</button>
           <div id="parse-input" style="display:none;margin-top:10px;">
+            ${rawPreview ? `<div style="font-size:11px;color:#7a8ba0;margin-bottom:6px;font-family:monospace;background:#f8f9fc;padding:8px;border-radius:4px;overflow:auto;max-height:80px;">${escHtml(rawPreview)}…</div>` : ''}
             <textarea id="manual-json" style="width:100%;min-height:100px;font-size:12px;font-family:monospace;border:1px solid #d0d8e4;border-radius:6px;padding:8px;" placeholder="Paste the full response from Claude here..."></textarea>
             <button class="btn-primary" style="font-size:12px;padding:6px 14px;margin-top:6px;" onclick="applyResult(document.getElementById('manual-json').value)">Apply</button>
           </div>
