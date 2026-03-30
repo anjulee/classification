@@ -140,9 +140,16 @@
 
 <div class="header">
   <div class="header-logo">UNOPS</div>
-  <div>
+  <div style="flex:1;">
     <div style="font-size:16px; font-weight:700;">TOR Classification Tool</div>
     <div style="font-size:12px; color:#9ab3d0; margin-top:1px;">AI-powered · ICS Level 1–14 · ICSC Methodology</div>
+  </div>
+  <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+    <label style="font-size:11px; color:#9ab3d0; font-weight:600; letter-spacing:0.4px; text-transform:uppercase; white-space:nowrap;">API Key</label>
+    <input type="password" id="api-key-input" placeholder="sk-ant-…" oninput="saveApiKey()"
+      style="width:200px; padding:6px 10px; font-size:12px; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.1); color:#fff; font-family:inherit; outline:none;"
+      onfocus="this.style.borderColor='rgba(255,255,255,0.5)'" onblur="this.style.borderColor='rgba(255,255,255,0.2)'">
+    <span id="key-status" style="font-size:11px; color:#9ab3d0;"></span>
   </div>
 </div>
 
@@ -582,7 +589,26 @@ function renderSidebar() {
   }).join('');
 }
 
-function saveTORs() { try { localStorage.setItem('unops_tors_v2', JSON.stringify(tors)); } catch(e) {} }
+function saveApiKey() {
+  const key = document.getElementById('api-key-input').value.trim();
+  try { if (key) localStorage.setItem('unops_api_key', key); else localStorage.removeItem('unops_api_key'); } catch(e) {}
+  updateKeyStatus(key);
+}
+function loadApiKey() {
+  try {
+    const key = localStorage.getItem('unops_api_key') || '';
+    if (key) { document.getElementById('api-key-input').value = key; updateKeyStatus(key); }
+  } catch(e) {}
+}
+function getApiKey() {
+  return document.getElementById('api-key-input').value.trim();
+}
+function updateKeyStatus(key) {
+  const el = document.getElementById('key-status');
+  if (key && key.startsWith('sk-ant-')) { el.textContent = '✓ set'; el.style.color = '#6fcf97'; }
+  else if (key) { el.textContent = '⚠ check key'; el.style.color = '#f2994a'; }
+  else { el.textContent = ''; }
+}
 function loadTORs() {
   try { const d = localStorage.getItem('unops_tors_v2'); if (d) tors = JSON.parse(d); } catch(e) {}
   renderSidebar();
@@ -690,12 +716,25 @@ JSON SCHEMA — respond with exactly this structure:
   "revisedFunctions": "<string or null>"
 }`;
 
-  // Call the Anthropic API directly — the claude.ai proxy handles auth automatically
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    switchTab('analysis');
+    document.getElementById('analysis-result').innerHTML =
+      `<div class="callout warning"><span class="callout-icon">⚠</span><div class="callout-text"><strong>API key required.</strong><br>Please enter your Anthropic API key in the field at the top of the page. You can get one at <a href="https://console.anthropic.com" target="_blank" style="color:#003168;">console.anthropic.com</a>.</div></div>`;
+    return;
+  }
+
+  // Call the Anthropic API with the user-provided key
   fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
-    headers: { "content-type": "application/json" },
+    headers: {
+      "content-type": "application/json",
+      "x-api-key": apiKey,
+      "anthropic-version": "2023-06-01",
+      "anthropic-dangerous-direct-browser-access": "true"
+    },
     body: JSON.stringify({
-      model: "claude-sonnet-4-6",
+      model: "claude-opus-4-6",
       max_tokens: 2500,
       messages: [{ role: "user", content: prompt }]
     })
@@ -704,7 +743,6 @@ JSON SCHEMA — respond with exactly this structure:
   .then(data => {
     if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
     const raw = (data.content || []).map(c => c.text || "").join("");
-    // Store pending context before calling applyResult
     window._pendingTOR = { ...tor };
     window._pendingTORId = currentTORId;
     applyResult(raw);
@@ -936,6 +974,7 @@ function escHtml(str) {
 }
 
 loadTORs();
+loadApiKey();
 </script>
 </body>
 </html>
