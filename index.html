@@ -43,7 +43,7 @@
   .form-group { display: flex; flex-direction: column; gap: 5px; }
   .form-group label { font-size: 12px; font-weight: 600; color: #4a5568; text-transform: uppercase; letter-spacing: 0.4px; }
   .form-group input[type=text], .form-group select, .form-group textarea,
-  .panel input[type=text], .panel select, .panel textarea { border: 1px solid #d0d8e4; border-radius: 6px; padding: 9px 12px; font-size: 13.5px; color: #1a2a40; font-family: inherit; background: #fafbfc; transition: border 0.15s; width: 100%; }
+  .panel input[type=text], .panel select, .panel textarea { border: 1px solid #d0d8e4; border-radius: 6px; padding: 9px 12px; font-size: 13px; color: #1a2a40; font-family: 'Courier New', monospace; background: #fafbfc; transition: border 0.15s; width: 100%; }
   .form-group input[type=text]:focus, .form-group select:focus, .form-group textarea:focus,
   .panel input[type=text]:focus, .panel select:focus, .panel textarea:focus { border-color: #3a7bd5; outline: none; background: #fff; }
   .panel textarea { resize: vertical; min-height: 120px; line-height: 1.6; }
@@ -261,7 +261,7 @@
           </div>
           <div style="position:relative; margin-bottom:10px;">
             <input type="text" id="skill-search" placeholder="Search skills… e.g. Recruitment, Data Analysis, Procurement" oninput="filterSkills()" autocomplete="off"
-              style="width:100%; padding:9px 12px; border:1px solid #d0d8e4; border-radius:6px; font-size:13.5px; color:#1a2a40; font-family:inherit; background:#fafbfc;">
+              style="width:100%; padding:9px 12px; border:1px solid #d0d8e4; border-radius:6px; font-size:13px; color:#1a2a40; font-family:'Courier New',monospace; background:#fafbfc;">
             <div id="skill-dropdown" style="display:none; position:absolute; top:100%; left:0; right:0; background:#fff; border:1px solid #d0d8e4; border-top:none; border-radius:0 0 6px 6px; max-height:200px; overflow-y:auto; z-index:100; box-shadow:0 4px 12px rgba(0,0,0,0.08);"></div>
           </div>
           <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
@@ -728,7 +728,7 @@ function runAnalysis() {
 
   const hasTarget = !!tor.targetICS;
 
-  const prompt = `You are an expert UNOPS HR classifier. Analyse the following TOR and respond with ONLY a valid JSON object — no prose, no markdown fences, just the raw JSON.
+  const prompt = `You are an expert UNOPS HR classifier. Analyse the following TOR and respond with ONLY a valid JSON object — no prose, no markdown fences, just the raw JSON. CRITICAL: all string values must be valid JSON — escape any apostrophes as \\u2019, avoid unescaped quotes inside strings, and do not include literal newlines inside string values.
 
 CLASSIFICATION FACTORS:
 1. Nature of Work: scope, depth, difficulty, knowledge, action verbs
@@ -832,22 +832,57 @@ JSON SCHEMA — respond with exactly this structure:
 // Expose globally as fallback
 window.applyTORResult = applyResult;
 
+function cleanJSON(raw) {
+  // Strip markdown fences
+  let s = raw.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
+
+  // Extract the outermost JSON object
+  const start = s.indexOf('{');
+  const end = s.lastIndexOf('}');
+  if (start === -1 || end === -1) throw new Error('No JSON object found in response.');
+  s = s.slice(start, end + 1);
+
+  // Fix common issues that break JSON parsers:
+  // 1. Unescaped apostrophes inside string values — replace ' with \u2019 (curly apostrophe) only inside strings
+  // 2. Trailing commas before ] or }
+  // 3. Unescaped newlines inside strings
+  s = s
+    .replace(/,\s*([\]}])/g, '$1')          // trailing commas
+    .replace(/\r?\n/g, '\\n')               // literal newlines inside strings
+    .replace(/\t/g, '\\t');                  // literal tabs
+
+  // Try to parse; if it fails, attempt a more aggressive recovery
+  try {
+    return JSON.parse(s);
+  } catch(e1) {
+    // Last resort: use Function constructor to evaluate as JS object literal
+    // (handles single quotes, unquoted keys, trailing commas more forgivingly)
+    try {
+      // Re-extract from original without the newline replacement (may have broken things)
+      let s2 = raw.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
+      s2 = s2.slice(s2.indexOf('{'), s2.lastIndexOf('}') + 1);
+      s2 = s2.replace(/,\s*([\]}])/g, '$1'); // trailing commas only
+      return JSON.parse(s2);
+    } catch(e2) {
+      throw new Error(`JSON parse failed: ${e1.message}`);
+    }
+  }
+}
+
 function applyResult(raw) {
   if (!window._pendingTOR) return;
   const tor = window._pendingTOR;
-  // Make sure the analysis tab is visible
   switchTab('analysis');
   const resultDiv = document.getElementById('analysis-result');
   try {
-    const jsonMatch = raw.replace(/```json|```/g, '').match(/\{[\s\S]*"classifiedLevel"[\s\S]*\}/);
-    if (!jsonMatch) throw new Error('No classification JSON found.');
-    const result = JSON.parse(jsonMatch[0]);
+    const result = cleanJSON(raw);
+    if (!result.classifiedLevel) throw new Error('Response did not contain a classifiedLevel — the model may not have returned valid JSON. Please try again.');
 
     const tid = window._pendingTORId;
-    if (result.classifiedLevel && tid && tors[tid]) {
+    if (tid && tors[tid]) {
       tors[tid].classifiedICS = result.classifiedLevel;
       tors[tid].classifiedAt = new Date().toISOString();
-      tors[tid].lastResult = result;  // persist full result
+      tors[tid].lastResult = result;
       if (result.functionArea) { tors[tid].area = result.functionArea; updateAreaTag(result.functionArea); }
       saveTORs(); renderSidebar();
     }
@@ -855,12 +890,22 @@ function applyResult(raw) {
     window._pendingTORId = null;
     renderResult(result, tor);
   } catch(err) {
-    resultDiv.innerHTML = `<div class="callout warning"><span class="callout-icon">⚠</span><div class="callout-text"><strong>Could not parse result.</strong> ${escHtml(err.message)}<br><br>
-    <button class="btn-primary" style="font-size:12px;padding:6px 14px;" onclick="document.getElementById('parse-input').style.display='block'">Paste JSON manually</button>
-    <div id="parse-input" style="display:none;margin-top:10px;">
-      <textarea id="manual-json" style="width:100%;min-height:80px;font-size:12px;font-family:monospace;" placeholder="Paste the JSON from Claude's response here..."></textarea>
-      <button class="btn-primary" style="font-size:12px;padding:6px 14px;margin-top:6px;" onclick="applyResult(document.getElementById('manual-json').value)">Apply</button>
-    </div></div></div>`;
+    resultDiv.innerHTML = `
+      <div class="callout warning">
+        <span class="callout-icon">⚠</span>
+        <div class="callout-text">
+          <strong>Could not read the classification result.</strong><br>
+          <span style="color:#7a8ba0;font-size:12px;">${escHtml(err.message)}</span><br><br>
+          This usually happens when the response contained an apostrophe or special character that broke the JSON. Try clicking <strong>Classify &amp; Analyse</strong> again — it should work on the next attempt.<br><br>
+          <button class="btn-primary" style="font-size:12px;padding:6px 14px;" onclick="runAnalysis()">↺ Try Again</button>
+          &nbsp;
+          <button style="font-size:12px;padding:6px 14px;background:#fff;color:#003168;border:1.5px solid #c5d6ee;border-radius:6px;cursor:pointer;font-family:inherit;" onclick="document.getElementById('parse-input').style.display='block'">Paste raw response</button>
+          <div id="parse-input" style="display:none;margin-top:10px;">
+            <textarea id="manual-json" style="width:100%;min-height:100px;font-size:12px;font-family:monospace;border:1px solid #d0d8e4;border-radius:6px;padding:8px;" placeholder="Paste the full response from Claude here..."></textarea>
+            <button class="btn-primary" style="font-size:12px;padding:6px 14px;margin-top:6px;" onclick="applyResult(document.getElementById('manual-json').value)">Apply</button>
+          </div>
+        </div>
+      </div>`;
   }
 }
 
@@ -1089,7 +1134,7 @@ function downloadPDF() {
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Classification Report — ${escHtml(tor.title)}</title>
+<title>Classification Report — ${escHtml(tor.title)} (ICS ${result.classifiedLevel})</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Segoe UI', Arial, sans-serif; color: #1a2a40; background: #fff; }
