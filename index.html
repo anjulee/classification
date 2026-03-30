@@ -212,6 +212,7 @@
           <div class="tab" onclick="switchTab('skills')">Skills</div>
           <div class="tab" onclick="switchTab('qualifications')">Qualifications</div>
           <div class="tab" onclick="switchTab('languages')">Languages</div>
+          <div class="tab" onclick="switchTab('analysis')" id="tab-analysis-btn">Classification</div>
         </div>
 
         <!-- UPLOAD TAB -->
@@ -292,18 +293,18 @@
           </table>
           <button class="btn-add-row" onclick="addLangRow()">+ Add language</button>
         </div>
-      </div>
 
-      <!-- CLASSIFICATION ANALYSIS -->
-      <div class="panel">
-        <div class="panel-header">
-          <span class="panel-title">Classification Analysis</span>
+        <!-- CLASSIFICATION TAB -->
+        <div class="tab-content" id="tab-analysis">
+          <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:18px;">
+            <div>
+              <div style="font-size:13px; color:#5a6a7e; line-height:1.6;">Analyse the TOR against the ICSC classification framework.<br>
+              <span style="font-size:12px; color:#9ab3d0;">The result will appear in this tab automatically after Claude responds in the chat.</span></div>
+            </div>
+            <button class="btn-run" onclick="runAnalysis()">▶ Classify &amp; Analyse</button>
+          </div>
+          <div id="analysis-result"></div>
         </div>
-        <div class="action-bar">
-          <button class="btn-run" id="run-btn" onclick="runAnalysis()">▶ Classify &amp; Analyse</button>
-          <span style="font-size:12px; color:#7a8ba0;" id="mode-hint">Sends TOR to Claude in this chat — result appears above automatically</span>
-        </div>
-        <div id="analysis-result" style="padding: 0 20px 20px; display:none;"></div>
       </div>
 
     </div>
@@ -425,7 +426,7 @@ function getSkillsFromTextarea() {
 
 /* ---- TABS ---- */
 function switchTab(tab) {
-  const tabs = ['upload','skills','qualifications','languages'];
+  const tabs = ['upload','skills','qualifications','languages','analysis'];
   document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', tabs[i] === tab));
   document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
   document.getElementById('tab-' + tab).classList.add('active');
@@ -499,7 +500,6 @@ function loadTOR(id) {
   if (skillsEl) skillsEl.value = (tor.skills || []).join('\n');
   renderLangTable(tor.languages || [{ lang: 'English', prof: 'Fluent', req: 'Required' }]);
   updateAreaTag(tor.area);
-  document.getElementById('analysis-result').style.display = 'none';
   document.getElementById('analysis-result').innerHTML = '';
   renderSidebar();
   switchTab('upload');
@@ -540,12 +540,21 @@ function saveDraft() {
 
 function deleteTOR() {
   if (!currentTORId) return;
-  if (!confirm(`Delete "${tors[currentTORId]?.title}"?`)) return;
-  delete tors[currentTORId];
-  currentTORId = null;
-  saveTORs(); renderSidebar();
-  document.getElementById('editor-state').style.display = 'none';
-  document.getElementById('welcome-state').style.display = 'block';
+  deleteTORById(currentTORId);
+}
+
+function deleteTORById(id) {
+  const title = tors[id]?.title || 'this TOR';
+  if (!confirm(`Delete "${title}"?`)) return;
+  delete tors[id];
+  if (currentTORId === id) {
+    currentTORId = null;
+    saveTORs(); renderSidebar();
+    document.getElementById('editor-state').style.display = 'none';
+    document.getElementById('welcome-state').style.display = 'block';
+  } else {
+    saveTORs(); renderSidebar();
+  }
 }
 
 function renderSidebar() {
@@ -556,9 +565,19 @@ function renderSidebar() {
     const ics = t.classifiedICS;
     const badgeClass = !ics ? 'ics-pending' : (parseInt(ics) <= 7 ? 'ics-support' : 'ics-professional');
     const badgeText = ics ? `ICS ${ics}` : 'pending';
-    return `<div class="tor-item${currentTORId===t.id?' active':''}" data-id="${t.id}" onclick="loadTOR('${t.id}')">
-      <div class="tor-item-title">${escHtml(t.title)}</div>
-      <div class="tor-item-meta">${escHtml(t.area||'No area')} <span class="ics-badge ${badgeClass}">${badgeText}</span></div>
+    const dateStr = t.classifiedAt
+      ? new Date(t.classifiedAt).toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'})
+      : new Date(t.createdAt).toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'});
+    const dateLabel = t.classifiedAt ? `Classified ${dateStr}` : `Created ${dateStr}`;
+    return `<div class="tor-item${currentTORId===t.id?' active':''}" data-id="${t.id}">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:4px;">
+        <div style="flex:1;min-width:0;cursor:pointer;" onclick="loadTOR('${t.id}')">
+          <div class="tor-item-title" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(t.title)}</div>
+          <div class="tor-item-meta">${escHtml(t.area||'No area')} <span class="ics-badge ${badgeClass}">${badgeText}</span></div>
+          <div style="font-size:10px;color:#aab4c0;margin-top:2px;">${dateLabel}</div>
+        </div>
+        <button onclick="deleteTORById('${t.id}')" title="Delete" style="background:none;border:none;cursor:pointer;color:#c5d6ee;font-size:14px;padding:2px 4px;flex-shrink:0;line-height:1;margin-top:1px;" onmouseover="this.style.color='#c0392b'" onmouseout="this.style.color='#c5d6ee'">✕</button>
+      </div>
     </div>`;
   }).join('');
 }
@@ -604,9 +623,10 @@ function runAnalysis() {
   if (!tor) return;
   if (!tor.functions?.trim()) { alert('Please add TOR content (functions/key results) before running analysis.'); return; }
 
+  // Switch to the analysis tab and show pending state
+  switchTab('analysis');
   const resultDiv = document.getElementById('analysis-result');
-  resultDiv.style.display = 'block';
-  resultDiv.innerHTML = `<div class="pending-banner"><div class="pending-dot"></div><div style="font-size:13px;color:#5a6a7e;">Analysis sent to Claude — scroll up to see the response, then click <strong>"Apply to TOR"</strong> in the result.</div></div>`;
+  resultDiv.innerHTML = `<div class="pending-banner"><div class="pending-dot"></div><div style="font-size:13px;color:#5a6a7e;">Sent to Claude — the result will appear here automatically once Claude responds in the chat above.</div></div>`;
 
   const hasTarget = !!tor.targetICS;
 
@@ -695,9 +715,14 @@ window.addEventListener('message', function(e) {
   applyResult(text);
 });
 
+// Expose globally so Claude can call window.applyTORResult(jsonString) directly from chat
+window.applyTORResult = applyResult;
+
 function applyResult(raw) {
   if (!window._pendingTOR) return;
   const tor = window._pendingTOR;
+  // Make sure the analysis tab is visible
+  switchTab('analysis');
   const resultDiv = document.getElementById('analysis-result');
   try {
     const jsonMatch = raw.replace(/```json|```/g, '').match(/\{[\s\S]*"classifiedLevel"[\s\S]*\}/);
@@ -707,6 +732,7 @@ function applyResult(raw) {
     const tid = window._pendingTORId;
     if (result.classifiedLevel && tid && tors[tid]) {
       tors[tid].classifiedICS = result.classifiedLevel;
+      tors[tid].classifiedAt = new Date().toISOString();
       if (result.functionArea) { tors[tid].area = result.functionArea; updateAreaTag(result.functionArea); }
       saveTORs(); renderSidebar();
     }
